@@ -1,5 +1,5 @@
 /* =====================================================
-   DARKKNIGHT STUDIO — Main App (Homepage)
+   DARKKNIGHT STUDIO — Main App (Homepage) — UI polish
    ===================================================== */
 
 window.DK = window.DK || {};
@@ -9,6 +9,8 @@ const App = {
   async init() {
     this.bindNav();
     this.bindMobileMenu();
+    this.bindHeaderScroll();
+    this.setYear();
 
     if (!DK.isConfigured) {
       this.showDemoMode();
@@ -26,6 +28,21 @@ const App = {
     ]);
 
     this.startAdminPresence();
+  },
+
+  setYear() {
+    const el = document.getElementById('year');
+    if (el) el.textContent = new Date().getFullYear();
+  },
+
+  bindHeaderScroll() {
+    const header = document.getElementById('header');
+    if (!header) return;
+    const onScroll = () => {
+      header.classList.toggle('scrolled', window.scrollY > 40);
+    };
+    window.addEventListener('scroll', DK.debounce ? DK.debounce(onScroll, 50) : onScroll, { passive: true });
+    onScroll();
   },
 
   bindNav() {
@@ -74,7 +91,6 @@ const App = {
         .maybeSingle();
 
       if (data && (data.value === true || data.value === 'true')) {
-        // Allow admins to bypass
         const admin = await DK.getAdminProfile();
         if (!admin) {
           const overlay = document.getElementById('maintenance-overlay');
@@ -213,7 +229,6 @@ const App = {
 
       if (error) throw error;
 
-      // Update hero quick stats
       if (heroStats && data) {
         data.forEach(s => {
           const el = heroStats.querySelector(`[data-stat="${s.key}"]`);
@@ -221,7 +236,6 @@ const App = {
         });
       }
 
-      // Full stats section
       if (grid) {
         if (!data || data.length === 0) {
           grid.innerHTML = `<div class="empty-state"><p>آماری تعریف نشده.</p></div>`;
@@ -271,7 +285,6 @@ const App = {
   async trackView() {
     const el = document.getElementById('view-count');
     try {
-      // Get current count
       const { data: stat } = await DK.supabase
         .from('statistics')
         .select('value')
@@ -280,7 +293,6 @@ const App = {
 
       if (el) el.textContent = (stat?.value ?? 0).toLocaleString('fa-IR');
 
-      // Increment if allowed (client + server side protection)
       if (DK.canIncrementView()) {
         const visitorId = DK.getVisitorId();
         await DK.supabase.from('visitor_events').insert({
@@ -290,10 +302,8 @@ const App = {
           user_agent: navigator.userAgent.slice(0, 200)
         });
 
-        // Atomic increment via RPC if available, else fallback
         const { error } = await DK.supabase.rpc('increment_stat', { stat_key: 'total_views' });
         if (error) {
-          // Fallback: read-modify-write (less ideal but works)
           if (stat) {
             await DK.supabase
               .from('statistics')
@@ -313,7 +323,6 @@ const App = {
   },
 
   startAdminPresence() {
-    // Public only reads the count; actual presence is updated from admin panel
     this.refreshAdminOnline();
     setInterval(() => this.refreshAdminOnline(), 30000);
   },
@@ -329,14 +338,12 @@ const App = {
       const el = document.querySelector('[data-stat="admins_online"]');
       if (el) el.textContent = count ?? 0;
 
-      // Also update stats table if exists
       const statEl = document.querySelector('#stats-grid [data-key="admins_online"] .stat-value');
       if (statEl) statEl.textContent = count ?? 0;
     } catch { /* ignore */ }
   },
 
   showDemoMode() {
-    // Show friendly message when Supabase is not configured
     const grids = ['projects-grid', 'news-grid', 'team-grid', 'stats-grid', 'links-grid'];
     grids.forEach(id => {
       const el = document.getElementById(id);
@@ -351,7 +358,6 @@ const App = {
       }
     });
 
-    // Demo stats
     const hero = document.getElementById('hero-stats');
     if (hero) {
       hero.querySelector('[data-stat="projects"]').textContent = '—';
