@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>پروفایل کاربری | Darkknight Studio</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#050508">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">⚔</span><span class="logo-text">DARKKNIGHT</span></a>
+      <nav class="nav" id="nav">
+        <a href="index.html" class="nav-link">خانه</a>
+        <a href="shop.html" class="nav-link">فروشگاه</a>
+        <a href="profile.html" class="nav-link active">پروفایل</a>
+        <a href="support.html" class="nav-link">پشتیبانی</a>
+      </nav>
+      <div class="header-actions">
+        <div class="header-auth" id="auth-slot"></div>
+        <button class="menu-toggle" id="menu-toggle" aria-label="منو"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container section" id="profile-root">
+    <div class="loading-state"><div class="spinner"></div><p>در حال بارگذاری…</p></div>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    const toggle = document.getElementById('menu-toggle');
+    const nav = document.getElementById('nav');
+    if (toggle && nav) toggle.onclick = () => { nav.classList.toggle('open'); toggle.classList.toggle('open'); };
+
+    (async () => {
+      if (!DK.isConfigured) DK.initSupabase();
+      const user = await AuthUI.requireAuth();
+      if (!user) return;
+
+      const root = document.getElementById('profile-root');
+      const profile = await DK.getProfile();
+      const admin = await DK.getAdminProfile();
+
+      let ordersHtml = '<p class="text-muted">هنوز سفارشی ثبت نشده یا جدول orders آماده نیست.</p>';
+      try {
+        const { data: orders } = await DK.supabase
+          .from('orders')
+          .select('id,order_number,status,payment_status,total,created_at')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(20);
+        if (orders && orders.length) {
+          const st = { pending_payment: 'در انتظار پرداخت', paid: 'پرداخت‌شده', processing: 'پردازش', ready: 'آماده', delivered: 'تحویل‌شده', cancelled: 'لغو', refunded: 'بازپرداخت' };
+          ordersHtml = `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.9rem">
+            <thead><tr style="border-bottom:1px solid var(--border);text-align:right">
+              <th style="padding:.5rem">شماره</th><th>وضعیت</th><th>مبلغ</th><th>تاریخ</th>
+            </tr></thead>
+            <tbody>${orders.map(o => `
+              <tr style="border-bottom:1px solid var(--border)">
+                <td style="padding:.5rem">${DK.escape(o.order_number)}</td>
+                <td>${st[o.status] || o.status}</td>
+                <td>${DK.formatPrice(o.total)}</td>
+                <td>${DK.formatDate(o.created_at)}</td>
+              </tr>`).join('')}</tbody></table></div>`;
+        }
+      } catch (_) {}
+
+      root.innerHTML = `
+        <h1 style="margin-bottom:1.5rem">پروفایل کاربری</h1>
+        <div class="grid grid-2">
+          <div class="card">
+            <h2 style="font-size:1.05rem;margin-bottom:1rem">اطلاعات حساب</h2>
+            <p style="margin-bottom:.5rem"><strong>ایمیل:</strong> <span dir="ltr">${DK.escape(user.email || '')}</span></p>
+            <p style="margin-bottom:1rem"><strong>نام نمایشی:</strong> ${DK.escape(profile?.display_name || '—')}</p>
+            <form id="profile-form">
+              <div class="form-group">
+                <label for="display_name">ویرایش نام نمایشی</label>
+                <input type="text" id="display_name" name="display_name" value="${DK.escape(profile?.display_name || '')}" maxlength="80">
+              </div>
+              <button type="submit" class="btn btn-primary btn-sm">ذخیره</button>
+            </form>
+            ${admin ? `<p style="margin-top:1rem"><a href="admin.html" class="btn btn-ghost btn-sm">پنل مدیریت</a>
+              ${admin.roles?.name === 'OWNER' ? '<a href="owner.html" class="btn btn-ghost btn-sm">پنل مالک</a>' : ''}</p>` : ''}
+          </div>
+          <div class="card">
+            <h2 style="font-size:1.05rem;margin-bottom:1rem">تغییر رمز عبور</h2>
+            <form id="pass-form">
+              <div class="form-group">
+                <label for="new_pass">رمز جدید (حداقل ۶ کاراکتر)</label>
+                <input type="password" id="new_pass" minlength="6" required dir="ltr">
+              </div>
+              <button type="submit" class="btn btn-ghost btn-sm">تغییر رمز</button>
+            </form>
+            <p class="form-hint" style="margin-top:.75rem">از سازوکار امن Supabase Auth استفاده می‌شود.</p>
+          </div>
+        </div>
+        <div class="card" style="margin-top:1.25rem">
+          <h2 style="font-size:1.05rem;margin-bottom:1rem">سفارش‌های من</h2>
+          ${ordersHtml}
+        </div>
+        <div style="margin-top:1.5rem">
+          <button type="button" class="btn btn-ghost" id="btn-logout-page">خروج از حساب</button>
+        </div>`;
+
+      DK.$('#profile-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = e.target.display_name.value.trim();
+        try {
+          const { error } = await DK.supabase.from('profiles').upsert({ id: user.id, display_name: name, updated_at: new Date().toISOString() });
+          if (error) throw error;
+          DK.toast('ذخیره شد', 'success');
+          AuthUI.refreshHeaderAuth();
+        } catch (err) {
+          DK.toast(err.message || 'خطا', 'error');
+        }
+      });
+
+      DK.$('#pass-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        try {
+          await DK.updatePassword(e.target.new_pass.value);
+          DK.toast('رمز عبور به‌روز شد', 'success');
+          e.target.reset();
+        } catch (err) {
+          DK.toast(err.message || 'خطا', 'error');
+        }
+      });
+
+      DK.$('#btn-logout-page')?.addEventListener('click', async () => {
+        await DK.signOut();
+        location.href = 'index.html';
+      });
+    })();
+  </script>
+</body>
+</html>
