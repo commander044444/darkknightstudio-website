@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>درخواست عضویت در تیم | Darkknight Studio دارک‌نایت استودیو</title>
+  <meta name="description" content="فرم درخواست عضویت در Darkknight Studio — دارک‌نایت استودیو. به تیم توسعه ربات، بازی و نرم‌افزار بپیوندید.">
+  <meta name="keywords" content="عضویت Darkknight, درخواست عضویت استودیو, join Darkknight Studio, استخدام توسعه‌دهنده ربات, عضویت تیم دارک‌نایت">
+  <meta name="theme-color" content="#050508">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <style>
+    .membership-wrap { max-width:640px; margin:2rem auto; padding:0 1rem 3rem; }
+    .privacy-note { background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius); padding:1rem; font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.5rem; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">⚔</span><span class="logo-text">DARKKNIGHT</span></a>
+      <nav class="nav" id="nav">
+        <a href="index.html" class="nav-link">خانه</a>
+        <a href="shop.html" class="nav-link">فروشگاه</a>
+        <a href="membership.html" class="nav-link active">عضویت</a>
+        <a href="support.html" class="nav-link">پشتیبانی</a>
+      </nav>
+      <div class="header-actions">
+        <div class="header-auth" id="auth-slot"></div>
+        <button class="menu-toggle" id="menu-toggle" aria-label="منو"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <div class="membership-wrap">
+    <div class="section-header" style="text-align:right;margin-bottom:1.5rem">
+      <h1>درخواست عضویت در Darkknight Studio</h1>
+      <p>اگر مهارت دارید و می‌خواهید روی پروژه‌های واقعی کار کنید، فرم زیر را پر کنید.</p>
+    </div>
+
+    <div class="privacy-note">
+      <strong>حریم خصوصی:</strong>
+      اطلاعات شما (از جمله شماره موبایل) فقط برای بررسی درخواست عضویت توسط نقش‌های مجاز استودیو استفاده می‌شود
+      و در گزارش‌های عمومی یا ابزارهای تحلیل شخص ثالث قرار نمی‌گیرد.
+      وارد کردن شماره موبایل به‌تنهایی به‌معنای تأیید مالکیت آن نیست.
+    </div>
+
+    <form id="membership-form" class="card">
+      <div class="form-group">
+        <label for="m-name">نام و نام خانوادگی *</label>
+        <input type="text" id="m-name" name="name" required maxlength="100">
+      </div>
+      <div class="form-group">
+        <label for="m-mobile">شماره موبایل *</label>
+        <input type="tel" id="m-mobile" name="mobile" required dir="ltr" placeholder="09xxxxxxxxx" pattern="09[0-9]{9}">
+        <p class="form-hint">الزامی — فقط برای ارتباط تیم بررسی</p>
+      </div>
+      <div class="form-group">
+        <label for="m-email">ایمیل (اختیاری)</label>
+        <input type="email" id="m-email" name="email" dir="ltr">
+      </div>
+      <div class="form-group">
+        <label for="m-messenger">نام کاربری پیام‌رسان</label>
+        <input type="text" id="m-messenger" name="messenger_username" dir="ltr" placeholder="@username">
+      </div>
+      <div class="form-group">
+        <label for="m-age">سن یا بازه سنی</label>
+        <input type="text" id="m-age" name="age" placeholder="مثلاً ۲۵ یا ۲۰–۳۰">
+      </div>
+      <div class="form-group">
+        <label for="m-skills">مهارت‌ها *</label>
+        <textarea id="m-skills" name="skills" rows="3" required placeholder="مثلاً Python, Node.js, طراحی UI…"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="m-interest">زمینه همکاری مورد علاقه</label>
+        <input type="text" id="m-interest" name="interest_area" placeholder="ربات، فرانت‌اند، بک‌اند، بازی…">
+      </div>
+      <div class="form-group">
+        <label for="m-exp">تجربه کاری</label>
+        <textarea id="m-exp" name="experience" rows="3"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="m-portfolio">نمونه‌کار / لینک</label>
+        <input type="url" id="m-portfolio" name="portfolio" dir="ltr" placeholder="https://…">
+      </div>
+      <div class="form-group">
+        <label for="m-github">GitHub یا پروفایل دیگر</label>
+        <input type="url" id="m-github" name="github_url" dir="ltr" placeholder="https://github.com/…">
+      </div>
+      <div class="form-group">
+        <label for="m-message">توضیحات</label>
+        <textarea id="m-message" name="message" rows="4"></textarea>
+      </div>
+      <p class="form-error" id="membership-error"></p>
+      <button type="submit" class="btn btn-primary btn-lg" style="width:100%">ارسال درخواست</button>
+    </form>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/membership.js"></script>
+</body>
+</html>
