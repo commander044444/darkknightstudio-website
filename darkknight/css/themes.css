@@ -1,0 +1,71 @@
+/* =====================================================
+   DARKKNIGHT STUDIO — Theme tokens
+   Dark professional theme by default
+   ===================================================== */
+
+:root {
+  /* Core palette — Darkknight */
+  --bg-deep: #050508;
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #12121a;
+  --bg-elevated: #1a1a24;
+  --bg-card: rgba(26, 26, 36, 0.85);
+  --bg-glass: rgba(18, 18, 26, 0.65);
+
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --border-glow: rgba(180, 180, 200, 0.25);
+
+  --text-primary: #f0f0f5;
+  --text-secondary: #a0a0b0;
+  --text-muted: #6a6a7a;
+  --text-inverse: #0a0a0f;
+
+  --accent: #c8c8d8;
+  --accent-hover: #e0e0ec;
+  --accent-dim: rgba(200, 200, 216, 0.15);
+  --accent-glow: rgba(200, 200, 216, 0.35);
+
+  --success: #3ecf8e;
+  --warning: #f5a623;
+  --danger: #ef4444;
+  --info: #60a5fa;
+
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 40px rgba(200, 200, 216, 0.08);
+
+  --font-sans: 'Vazirmatn', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+
+  --header-h: 64px;
+  --container: 1200px;
+  --transition: 0.2s ease;
+
+  color-scheme: dark;
+}
+
+/* Optional light variant (future) */
+[data-theme="light"] {
+  --bg-deep: #f5f5f8;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f0f0f4;
+  --bg-elevated: #e8e8ee;
+  --bg-card: rgba(255, 255, 255, 0.9);
+  --bg-glass: rgba(255, 255, 255, 0.7);
+  --border: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.14);
+  --text-primary: #12121a;
+  --text-secondary: #4a4a5a;
+  --text-muted: #7a7a8a;
+  --text-inverse: #f0f0f5;
+  --accent: #2a2a3a;
+  --accent-hover: #1a1a24;
+  --accent-dim: rgba(42, 42, 58, 0.1);
+  color-scheme: light;
+}
