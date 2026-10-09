@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تماس با ما | Darkknight Studio دارک‌نایت استودیو</title>
+  <meta name="description" content="راه‌های ارتباط با Darkknight Studio — دارک‌نایت استودیو.">
+  <meta name="keywords" content="تماس Darkknight, ارتباط دارک‌نایت, contact Darkknight Studio">
+  <meta name="theme-color" content="#050508">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">⚔</span><span class="logo-text">DARKKNIGHT</span></a>
+      <nav class="nav" id="nav">
+        <a href="index.html" class="nav-link">خانه</a>
+        <a href="shop.html" class="nav-link">فروشگاه</a>
+        <a href="projects.html" class="nav-link">پروژه‌ها</a>
+        <a href="membership.html" class="nav-link">عضویت</a>
+        <a href="support.html" class="nav-link">پشتیبانی</a>
+        <a href="contact.html" class="nav-link active">تماس</a>
+      </nav>
+      <div class="header-actions">
+        <div class="header-auth" id="auth-slot"></div>
+        <button class="menu-toggle" id="menu-toggle" aria-label="منو"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container section">
+    <div class="section-header">
+      <h1>تماس با Darkknight Studio</h1>
+      <p>از طریق لینک‌های رسمی یا سیستم تیکت با ما در ارتباط باشید.</p>
+    </div>
+    <div class="grid grid-2" style="max-width:800px;margin:0 auto">
+      <div class="card">
+        <h3 style="margin-bottom:.75rem">پشتیبانی</h3>
+        <p class="text-muted" style="margin-bottom:1rem">سوال فنی یا مشکل سفارش؟ تیکت ثبت کنید.</p>
+        <a href="support.html" class="btn btn-primary">مرکز پشتیبانی</a>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:.75rem">عضویت در تیم</h3>
+        <p class="text-muted" style="margin-bottom:1rem">درخواست همکاری و عضویت در استودیو.</p>
+        <a href="membership.html" class="btn btn-ghost">فرم عضویت</a>
+      </div>
+    </div>
+    <div class="card" style="max-width:800px;margin:1.5rem auto 0">
+      <h3 style="margin-bottom:1rem">لینک‌های رسمی</h3>
+      <div id="contact-links" class="grid grid-2">
+        <div class="loading-state"><div class="spinner"></div></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-bottom">
+      <span>© <span id="year"></span> Darkknight Studio</span>
+      <a href="index.html">خانه</a>
+    </div>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    const toggle = document.getElementById('menu-toggle');
+    const nav = document.getElementById('nav');
+    if (toggle && nav) toggle.onclick = () => { nav.classList.toggle('open'); toggle.classList.toggle('open'); };
+
+    (async () => {
+      if (!DK.isConfigured) DK.initSupabase();
+      const el = document.getElementById('contact-links');
+      try {
+        const { data } = await DK.supabase
+          .from('official_links')
+          .select('title,url,icon')
+          .eq('is_visible', true)
+          .order('display_order');
+        if (!data || !data.length) {
+          el.innerHTML = '<p class="text-muted">لینکی ثبت نشده است</p>';
+          return;
+        }
+        el.innerHTML = data.map(l => `
+          <a href="${DK.escape(l.url)}" target="_blank" rel="noopener" class="btn btn-ghost" style="justify-content:flex-start">
+            <span>${l.icon || '🔗'}</span> ${DK.escape(l.title)}
+          </a>`).join('');
+      } catch (e) {
+        el.innerHTML = '<p class="text-muted">—</p>';
+      }
+    })();
+  </script>
+</body>
+</html>
