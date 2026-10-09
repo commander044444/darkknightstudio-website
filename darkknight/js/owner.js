@@ -1,5 +1,6 @@
 /* =====================================================
    DARKKNIGHT STUDIO — Owner panel
+   Requires email + password login (OWNER role only)
    ===================================================== */
 
 const Owner = {
@@ -7,11 +8,79 @@ const Owner = {
 
   async init() {
     if (!DK.isConfigured) DK.initSupabase();
-    this.admin = await AuthUI.requireOwner();
-    if (!this.admin) return;
+
+    const user = await DK.getUser();
+    if (!user) {
+      this.renderLoginForm();
+      return;
+    }
+
+    this.admin = await DK.getAdminProfile();
+    if (!this.admin || this.admin.roles?.name !== 'OWNER') {
+      this.renderLoginForm('فقط مالک اصلی به این بخش دسترسی دارد.');
+      await DK.signOut();
+      return;
+    }
+
     this.render();
     await this.loadSettings();
     await this.loadAdmins();
+  },
+
+  renderLoginForm(errorMsg) {
+    document.getElementById('owner-app').innerHTML = `
+      <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem;background:var(--bg-deep)">
+        <div class="card" style="width:100%;max-width:400px">
+          <div style="text-align:center;margin-bottom:1.25rem">
+            <div style="font-size:2rem;margin-bottom:.5rem">⚔</div>
+            <h1 style="font-size:1.25rem;margin-bottom:.25rem">پنل مالک</h1>
+            <p class="text-muted" style="font-size:.9rem">Darkknight Studio — ورود Owner</p>
+          </div>
+          <form id="owner-login-form">
+            <div class="form-group">
+              <label for="owner-email">ایمیل</label>
+              <input type="email" id="owner-email" name="email" required autocomplete="username" dir="ltr">
+            </div>
+            <div class="form-group">
+              <label for="owner-password">رمز عبور</label>
+              <input type="password" id="owner-password" name="password" required autocomplete="current-password" dir="ltr" minlength="6">
+            </div>
+            <p class="form-error" id="owner-login-error">${errorMsg ? DK.escape(errorMsg) : ''}</p>
+            <button type="submit" class="btn btn-primary" style="width:100%">ورود</button>
+          </form>
+          <p style="text-align:center;margin-top:1rem">
+            <a href="admin.html" class="btn btn-ghost btn-sm">پنل مدیریت</a>
+            <a href="index.html" class="btn btn-ghost btn-sm">سایت</a>
+          </p>
+        </div>
+      </div>`;
+
+    document.getElementById('owner-login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const errEl = document.getElementById('owner-login-error');
+      const btn = form.querySelector('[type="submit"]');
+      errEl.textContent = '';
+      DK.setLoading(btn, true);
+      try {
+        await DK.signIn(form.email.value.trim(), form.password.value);
+        const admin = await DK.getAdminProfile();
+        if (!admin || admin.roles?.name !== 'OWNER') {
+          await DK.signOut();
+          errEl.textContent = 'فقط حساب OWNER مجاز است.';
+          return;
+        }
+        this.admin = admin;
+        this.render();
+        await this.loadSettings();
+        await this.loadAdmins();
+        DK.toast('ورود موفق', 'success');
+      } catch (err) {
+        errEl.textContent = err.message || 'ایمیل یا رمز اشتباه است';
+      } finally {
+        DK.setLoading(btn, false);
+      }
+    });
   },
 
   render() {
@@ -52,7 +121,9 @@ const Owner = {
     document.getElementById('owner-logout')?.addEventListener('click', async e => {
       e.preventDefault();
       await DK.signOut();
-      location.href = 'login.html';
+      this.admin = null;
+      this.renderLoginForm();
+      DK.toast('خارج شدید', 'info');
     });
   },
 
@@ -110,7 +181,7 @@ const Owner = {
              <td>${a.is_active ? 'بله' : 'خیر'}</td>
              <td>${DK.formatDate(a.created_at)}</td>
            </tr>`).join('')}</tbody></table>
-           <p class="form-hint" style="margin-top:1rem">برای افزودن ادمین جدید، از SQL Editor در Supabase استفاده کنید (امن‌تر از فرانت‌اند).</p>`;
+           <p class="form-hint" style="margin-top:1rem">برای افزودن ادمین جدید، از SQL Editor در Supabase استفاده کنید.</p>`;
     } catch (e) {
       el.innerHTML = `<p class="form-error">${DK.escape(e.message)}</p>`;
     }
