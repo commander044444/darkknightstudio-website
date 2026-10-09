@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ورود و ثبت‌نام | Darkknight Studio دارک‌نایت استودیو</title>
+  <meta name="description" content="ورود و ثبت‌نام در Darkknight Studio — دارک‌نایت استودیو. دسترسی به پروفایل، سفارش‌ها و دانلود محصولات دیجیتال.">
+  <meta name="keywords" content="ورود Darkknight, ثبت‌نام دارک‌نایت, login Darkknight Studio, عضویت فروشگاه ربات">
+  <meta name="theme-color" content="#050508">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <style>
+    .auth-wrap { min-height: calc(100vh - var(--header-h)); display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    .auth-card { width:100%; max-width:400px; }
+    .auth-tabs { display:flex; gap:0.25rem; margin-bottom:1.5rem; background:var(--bg-secondary); border-radius:var(--radius); padding:0.25rem; }
+    .auth-tab { flex:1; padding:0.6rem; text-align:center; border-radius:var(--radius-sm); font-weight:600; font-size:0.9rem; color:var(--text-muted); cursor:pointer; }
+    .auth-tab.active { background:var(--bg-elevated); color:var(--text-primary); }
+    .auth-panel { display:none; }
+    .auth-panel.active { display:block; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">⚔</span><span class="logo-text">DARKKNIGHT</span></a>
+      <div class="header-auth" id="auth-slot"></div>
+    </div>
+  </header>
+
+  <div class="auth-wrap">
+    <div class="card auth-card">
+      <h1 style="text-align:center;font-size:1.35rem;margin-bottom:0.25rem">Darkknight Studio</h1>
+      <p class="text-muted text-center" style="margin-bottom:1.25rem;font-size:0.9rem">ورود یا ساخت حساب کاربری</p>
+
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab active" data-tab="login">ورود</button>
+        <button type="button" class="auth-tab" data-tab="register">ثبت‌نام</button>
+      </div>
+
+      <div class="auth-panel active" id="panel-login">
+        <form id="login-form">
+          <div class="form-group">
+            <label for="login-email">ایمیل</label>
+            <input type="email" id="login-email" name="email" required autocomplete="email" dir="ltr">
+          </div>
+          <div class="form-group">
+            <label for="login-password">رمز عبور</label>
+            <input type="password" id="login-password" name="password" required autocomplete="current-password" dir="ltr" minlength="6">
+          </div>
+          <p class="form-error" id="login-error"></p>
+          <button type="submit" class="btn btn-primary" style="width:100%">ورود</button>
+        </form>
+      </div>
+
+      <div class="auth-panel" id="panel-register">
+        <form id="register-form">
+          <div class="form-group">
+            <label for="reg-name">نام نمایشی</label>
+            <input type="text" id="reg-name" name="display_name" autocomplete="name">
+          </div>
+          <div class="form-group">
+            <label for="reg-email">ایمیل</label>
+            <input type="email" id="reg-email" name="email" required autocomplete="email" dir="ltr">
+          </div>
+          <div class="form-group">
+            <label for="reg-password">رمز عبور (حداقل ۶ کاراکتر)</label>
+            <input type="password" id="reg-password" name="password" required autocomplete="new-password" dir="ltr" minlength="6">
+          </div>
+          <p class="form-error" id="register-error"></p>
+          <button type="submit" class="btn btn-primary" style="width:100%">ثبت‌نام</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.querySelectorAll('.auth-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.auth-panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+      });
+    });
+    // Open register tab if ?tab=register
+    if (new URLSearchParams(location.search).get('tab') === 'register') {
+      document.querySelector('[data-tab="register"]').click();
+    }
+  </script>
+</body>
+</html>
