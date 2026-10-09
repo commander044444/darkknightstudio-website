@@ -13,7 +13,7 @@ window.DK_CONFIG = {
   // Base path for GitHub Pages subfolder compatibility
   // When hosted at /darkknightstudio-website/darkknight/ set BASE_PATH = '/darkknightstudio-website/darkknight'
   // When at root of a dedicated repo set BASE_PATH = ''
-  BASE_PATH: '',
+  BASE_PATH: '/darkknightstudio-website/darkknight',
 
   // App meta
   SITE_NAME: 'Darkknight Studio',
