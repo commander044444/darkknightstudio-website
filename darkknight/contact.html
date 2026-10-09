@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>تماس با ما | Darkknight Studio دارک‌نایت استودیو</title>
   <meta name="description" content="راه‌های ارتباط با Darkknight Studio — دارک‌نایت استودیو.">
-  <meta name="keywords" content="تماس Darkknight, ارتباط دارک‌نایت, contact Darkknight Studio">
   <meta name="theme-color" content="#050508">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔</text></svg>">
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/themes.css">
   <link rel="stylesheet" href="css/main.css">
@@ -26,7 +24,6 @@
         <a href="contact.html" class="nav-link active">تماس</a>
       </nav>
       <div class="header-actions">
-        <div class="header-auth" id="auth-slot"></div>
         <button class="menu-toggle" id="menu-toggle" aria-label="منو"><span></span><span></span><span></span></button>
       </div>
     </div>
@@ -64,38 +61,56 @@
     </div>
   </footer>
 
-  <script src="js/config.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/utils.js"></script>
-  <script src="js/supabase.js"></script>
-  <script src="js/auth.js"></script>
   <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
-    const toggle = document.getElementById('menu-toggle');
-    const nav = document.getElementById('nav');
-    if (toggle && nav) toggle.onclick = () => { nav.classList.toggle('open'); toggle.classList.toggle('open'); };
+  (function () {
+    var URL = "https://exaryvtjayuwgyqnioem.supabase.co";
+    var KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4YXJ5dnRqYXl1d2d5cW5pb2VtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1NzgxMjUsImV4cCI6MjEwNTE1NDEyNX0.qMKyG9gwUTeNbfXhzbSbTEJMEh4Dy-5M3gZ9vXpmsKs";
 
-    (async () => {
-      if (!DK.isConfigured) DK.initSupabase();
-      const el = document.getElementById('contact-links');
-      try {
-        const { data } = await DK.supabase
-          .from('official_links')
-          .select('title,url,icon')
-          .eq('is_visible', true)
-          .order('display_order');
+    function esc(s) {
+      if (s == null) return "";
+      return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    var y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+
+    var toggle = document.getElementById("menu-toggle");
+    var nav = document.getElementById("nav");
+    if (toggle && nav) {
+      toggle.onclick = function () {
+        nav.classList.toggle("open");
+        toggle.classList.toggle("open");
+      };
+    }
+
+    var el = document.getElementById("contact-links");
+    fetch(URL + "/rest/v1/official_links?select=title,url,icon&is_visible=eq.true&order=display_order", {
+      headers: { "apikey": KEY, "Authorization": "Bearer " + KEY }
+    })
+      .then(function (r) {
+        if (!r.ok) throw new Error(r.status);
+        return r.json();
+      })
+      .then(function (data) {
         if (!data || !data.length) {
-          el.innerHTML = '<p class="text-muted">لینکی ثبت نشده است</p>';
+          el.innerHTML = '<p class="text-muted">لینکی ثبت نشده است — از پنل مدیریت اضافه کنید</p>';
           return;
         }
-        el.innerHTML = data.map(l => `
-          <a href="${DK.escape(l.url)}" target="_blank" rel="noopener" class="btn btn-ghost" style="justify-content:flex-start">
-            <span>${l.icon || '🔗'}</span> ${DK.escape(l.title)}
-          </a>`).join('');
-      } catch (e) {
-        el.innerHTML = '<p class="text-muted">—</p>';
-      }
-    })();
+        el.innerHTML = data.map(function (l) {
+          var href = esc(l.url);
+          // ensure protocol for relative-looking urls
+          if (href && !/^https?:\/\//i.test(href) && !/^\/\//.test(href)) {
+            href = "https://" + href.replace(/^Https?:\/\//i, "");
+          }
+          return '<a href="' + href + '" target="_blank" rel="noopener" class="btn btn-ghost" style="justify-content:flex-start">' +
+            '<span>' + (l.icon || "🔗") + '</span> ' + esc(l.title) +
+            "</a>";
+        }).join("");
+      })
+      .catch(function () {
+        el.innerHTML = '<p class="text-muted">خطا در بارگذاری لینک‌ها</p>';
+      });
+  })();
   </script>
 </body>
 </html>
