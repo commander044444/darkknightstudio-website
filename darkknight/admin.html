@@ -71,11 +71,18 @@
   </div>
   <div id="admin-dashboard"></div>
 
-  <script src="js/config.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // Inline config so admin never depends on failed external config load
+    window.DK_CONFIG = {
+      SUPABASE_URL: 'https://exaryvtjayuwgyqnioem.supabase.co',
+      SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4YXJ5dnRqYXl1d2d5cW5pb2VtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1NzgxMjUsImV4cCI6MjEwNTE1NDEyNX0.qMKyG9gwUTeNbfXhzbSbTEJMEh4Dy-5M3gZ9vXpmsKs',
+      BASE_PATH: '/darkknightstudio-website/darkknight',
+      SITE_NAME: 'Darkknight Studio'
+    };
+    window.DK = window.DK || {};
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js"></script>
   <script src="js/utils.js"></script>
-  <script src="js/supabase.js"></script>
-  <script src="js/permissions.js"></script>
   <script src="js/admin.js"></script>
 </body>
 </html>
