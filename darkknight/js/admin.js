@@ -1,301 +1,301 @@
-/* =====================================================
-   DARKKNIGHT STUDIO — Admin panel (real data)
-   ===================================================== */
-
+/* Darkknight Studio — Admin panel: real login form first */
 const Admin = {
   admin: null,
 
-  async init() {
-    if (!DK.isConfigured) DK.initSupabase();
-
-    // Always require explicit session check — show login form if not admin
-    const user = await DK.getUser();
-    if (!user) {
-      this.renderLoginForm();
-      return;
+  init() {
+    try {
+      if (window.DK && !DK.isConfigured && typeof DK.initSupabase === "function") {
+        DK.initSupabase();
+      }
+    } catch (e) {
+      console.warn(e);
     }
-
-    this.admin = await DK.getAdminProfile();
-    if (!this.admin) {
-      this.renderLoginForm('این حساب دسترسی مدیریت ندارد. با ایمیل و رمز ادمین وارد شوید.');
-      await DK.signOut();
-      return;
-    }
-
-    this.renderShell();
-    await this.loadDashboard();
+    const form = document.getElementById("admin-login-form");
+    if (form) form.addEventListener("submit", (e) => this.handleLogin(e));
   },
 
-  renderLoginForm(errorMsg) {
-    document.getElementById('admin-app').innerHTML = `
-      <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem;background:var(--bg-deep)">
-        <div class="card" style="width:100%;max-width:400px">
-          <div style="text-align:center;margin-bottom:1.25rem">
-            <div style="font-size:2rem;margin-bottom:.5rem">⚔</div>
-            <h1 style="font-size:1.25rem;margin-bottom:.25rem">پنل مدیریت</h1>
-            <p class="text-muted" style="font-size:.9rem">Darkknight Studio — ورود ادمین</p>
-          </div>
-          <form id="admin-login-form">
-            <div class="form-group">
-              <label for="admin-email">ایمیل</label>
-              <input type="email" id="admin-email" name="email" required autocomplete="username" dir="ltr" placeholder="admin@example.com">
-            </div>
-            <div class="form-group">
-              <label for="admin-password">رمز عبور</label>
-              <input type="password" id="admin-password" name="password" required autocomplete="current-password" dir="ltr" minlength="6">
-            </div>
-            <p class="form-error" id="admin-login-error">${errorMsg ? DK.escape(errorMsg) : ''}</p>
-            <button type="submit" class="btn btn-primary" style="width:100%">ورود به پنل</button>
-          </form>
-          <p style="text-align:center;margin-top:1rem">
-            <a href="index.html" class="btn btn-ghost btn-sm">بازگشت به سایت</a>
-          </p>
-        </div>
-      </div>`;
+  async handleLogin(e) {
+    e.preventDefault();
+    const form = e.target;
+    const errEl = document.getElementById("admin-login-error");
+    const btn = document.getElementById("admin-login-btn");
+    if (errEl) errEl.textContent = "";
 
-    document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const form = e.target;
-      const errEl = document.getElementById('admin-login-error');
-      const btn = form.querySelector('[type="submit"]');
-      errEl.textContent = '';
-      DK.setLoading(btn, true);
-      try {
-        await DK.signIn(form.email.value.trim(), form.password.value);
-        const admin = await DK.getAdminProfile();
-        if (!admin) {
-          await DK.signOut();
-          errEl.textContent = 'این حساب دسترسی مدیریت ندارد.';
-          DK.toast('دسترسی مجاز نیست', 'error');
-          return;
-        }
-        DK.toast('ورود موفق', 'success');
-        this.admin = admin;
-        this.renderShell();
-        await this.loadDashboard();
-      } catch (err) {
-        errEl.textContent = err.message || 'ایمیل یا رمز عبور اشتباه است';
-        DK.toast(err.message || 'خطا در ورود', 'error');
-      } finally {
-        DK.setLoading(btn, false);
+    const email = (form.email.value || "").trim();
+    const password = form.password.value || "";
+    if (!email || !password) {
+      if (errEl) errEl.textContent = "ایمیل و رمز عبور را وارد کنید.";
+      return;
+    }
+
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "در حال ورود…";
+    }
+
+    try {
+      if (!window.DK || !DK.supabase) {
+        if (typeof DK !== "undefined" && DK.initSupabase) DK.initSupabase();
       }
-    });
+      if (!DK.supabase) throw new Error("اتصال Supabase برقرار نشد. صفحه را رفرش کنید.");
+
+      const { data, error } = await DK.supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+
+      if (DK._sessionCache !== undefined) DK._sessionCache = data.session;
+
+      const { data: adminRow, error: adminErr } = await DK.supabase
+        .from("admins")
+        .select("*, roles(name, permissions)")
+        .eq("user_id", data.user.id)
+        .eq("is_active", true)
+        .maybeSingle();
+
+      if (adminErr) throw adminErr;
+
+      if (!adminRow) {
+        await DK.supabase.auth.signOut();
+        if (errEl) errEl.textContent = "این حساب دسترسی مدیریت ندارد.";
+        return;
+      }
+
+      this.admin = adminRow;
+      this.showDashboard();
+    } catch (err) {
+      console.error(err);
+      let msg = err.message || "خطا در ورود";
+      if (/invalid login|invalid_credentials|Invalid login/i.test(msg)) {
+        msg = "ایمیل یا رمز عبور اشتباه است.";
+      }
+      if (errEl) errEl.textContent = msg;
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = "ورود به پنل";
+      }
+    }
+  },
+
+  showDashboard() {
+    const login = document.getElementById("admin-login-screen");
+    const dash = document.getElementById("admin-dashboard");
+    if (login) login.style.display = "none";
+    if (dash) {
+      dash.style.display = "block";
+      this.renderShell();
+      this.loadDashboard();
+    }
+  },
+
+  showLogin() {
+    const login = document.getElementById("admin-login-screen");
+    const dash = document.getElementById("admin-dashboard");
+    if (dash) { dash.style.display = "none"; dash.innerHTML = ""; }
+    if (login) login.style.display = "flex";
+    const form = document.getElementById("admin-login-form");
+    if (form) form.reset();
+    const errEl = document.getElementById("admin-login-error");
+    if (errEl) errEl.textContent = "";
+  },
+
+  escape(str) {
+    if (str == null) return "";
+    const d = document.createElement("div");
+    d.textContent = String(str);
+    return d.innerHTML;
   },
 
   renderShell() {
-    const isOwner = this.admin.roles?.name === 'OWNER';
-    document.getElementById('admin-app').innerHTML = `
-      <div class="dash-layout">
-        <aside class="dash-sidebar">
-          <div class="dash-brand"><span>⚔</span> پنل مدیریت</div>
-          <nav class="dash-nav">
-            <a href="#" data-panel="dashboard" class="active">داشبورد</a>
-            <a href="#" data-panel="tickets">تیکت‌ها</a>
-            <a href="#" data-panel="memberships">درخواست عضویت</a>
-            <a href="#" data-panel="projects">پروژه‌ها</a>
-            <a href="#" data-panel="products">محصولات</a>
-            <a href="#" data-panel="orders">سفارش‌ها</a>
-            <a href="#" data-panel="news">اخبار</a>
-            ${isOwner ? '<a href="owner.html">پنل مالک ←</a>' : ''}
-            <a href="index.html">بازگشت به سایت</a>
-            <a href="#" id="admin-logout">خروج</a>
-          </nav>
-        </aside>
-        <main class="dash-main">
-          <div class="dash-header">
-            <h1 id="panel-title" style="font-size:1.25rem;margin:0">داشبورد</h1>
-            <span class="text-muted" style="font-size:.85rem">${DK.escape(this.admin.display_name || this.admin.roles?.name || '')}</span>
-          </div>
-          <div id="panel-dashboard" class="dash-panel active"></div>
-          <div id="panel-tickets" class="dash-panel"></div>
-          <div id="panel-memberships" class="dash-panel"></div>
-          <div id="panel-projects" class="dash-panel"></div>
-          <div id="panel-products" class="dash-panel"></div>
-          <div id="panel-orders" class="dash-panel"></div>
-          <div id="panel-news" class="dash-panel"></div>
-        </main>
-      </div>`;
+    const isOwner = this.admin.roles && this.admin.roles.name === "OWNER";
+    const name = this.admin.display_name || (this.admin.roles && this.admin.roles.name) || "ادمین";
+    document.getElementById("admin-dashboard").innerHTML =
+      '<div class="dash-layout">' +
+      '<aside class="dash-sidebar">' +
+      '<div class="dash-brand"><span>⚔</span> پنل مدیریت</div>' +
+      '<nav class="dash-nav">' +
+      '<a href="#" data-panel="dashboard" class="active">داشبورد</a>' +
+      '<a href="#" data-panel="tickets">تیکت‌ها</a>' +
+      '<a href="#" data-panel="memberships">درخواست عضویت</a>' +
+      '<a href="#" data-panel="projects">پروژه‌ها</a>' +
+      '<a href="#" data-panel="products">محصولات</a>' +
+      '<a href="#" data-panel="orders">سفارش‌ها</a>' +
+      '<a href="#" data-panel="news">اخبار</a>' +
+      (isOwner ? '<a href="owner.html">پنل مالک ←</a>' : '') +
+      '<a href="index.html">بازگشت به سایت</a>' +
+      '<a href="#" id="admin-logout">خروج</a>' +
+      '</nav></aside>' +
+      '<main class="dash-main">' +
+      '<div class="dash-header"><h1 id="panel-title" style="font-size:1.25rem;margin:0">داشبورد</h1>' +
+      '<span class="text-muted" style="font-size:.85rem">' + this.escape(name) + '</span></div>' +
+      '<div id="panel-dashboard" class="dash-panel active"></div>' +
+      '<div id="panel-tickets" class="dash-panel"></div>' +
+      '<div id="panel-memberships" class="dash-panel"></div>' +
+      '<div id="panel-projects" class="dash-panel"></div>' +
+      '<div id="panel-products" class="dash-panel"></div>' +
+      '<div id="panel-orders" class="dash-panel"></div>' +
+      '<div id="panel-news" class="dash-panel"></div>' +
+      '</main></div>';
 
-    document.querySelectorAll('.dash-nav a[data-panel]').forEach(a => {
-      a.addEventListener('click', (e) => {
-        e.preventDefault();
+    document.querySelectorAll(".dash-nav a[data-panel]").forEach((a) => {
+      a.addEventListener("click", (ev) => {
+        ev.preventDefault();
         this.showPanel(a.dataset.panel);
-        document.querySelectorAll('.dash-nav a').forEach(x => x.classList.remove('active'));
-        a.classList.add('active');
+        document.querySelectorAll(".dash-nav a").forEach((x) => x.classList.remove("active"));
+        a.classList.add("active");
       });
     });
-    document.getElementById('admin-logout')?.addEventListener('click', async (e) => {
-      e.preventDefault();
-      await DK.signOut();
+    document.getElementById("admin-logout").addEventListener("click", async (ev) => {
+      ev.preventDefault();
+      try { await DK.supabase.auth.signOut(); } catch (_) {}
+      if (DK._sessionCache !== undefined) DK._sessionCache = null;
       this.admin = null;
-      this.renderLoginForm();
-      DK.toast('از پنل خارج شدید', 'info');
+      this.showLogin();
     });
   },
 
   showPanel(name) {
-    document.querySelectorAll('.dash-panel').forEach(p => p.classList.remove('active'));
-    const el = document.getElementById('panel-' + name);
-    if (el) el.classList.add('active');
-    const titles = { dashboard: 'داشبورد', tickets: 'تیکت‌ها', memberships: 'درخواست عضویت', projects: 'پروژه‌ها', products: 'محصولات', orders: 'سفارش‌ها', news: 'اخبار' };
-    document.getElementById('panel-title').textContent = titles[name] || name;
-    if (name === 'tickets') this.loadTickets();
-    if (name === 'memberships') this.loadMemberships();
-    if (name === 'projects') this.loadProjects();
-    if (name === 'products') this.loadProducts();
-    if (name === 'orders') this.loadOrders();
-    if (name === 'news') this.loadNews();
+    document.querySelectorAll(".dash-panel").forEach((p) => p.classList.remove("active"));
+    const el = document.getElementById("panel-" + name);
+    if (el) el.classList.add("active");
+    const titles = { dashboard: "داشبورد", tickets: "تیکت‌ها", memberships: "درخواست عضویت", projects: "پروژه‌ها", products: "محصولات", orders: "سفارش‌ها", news: "اخبار" };
+    const t = document.getElementById("panel-title");
+    if (t) t.textContent = titles[name] || name;
+    if (name === "tickets") this.loadTickets();
+    if (name === "memberships") this.loadMemberships();
+    if (name === "projects") this.loadProjects();
+    if (name === "products") this.loadProducts();
+    if (name === "orders") this.loadOrders();
+    if (name === "news") this.loadNews();
   },
 
   async loadDashboard() {
-    const el = document.getElementById('panel-dashboard');
+    const el = document.getElementById("panel-dashboard");
+    if (!el) return;
     el.innerHTML = '<div class="loading-state"><div class="spinner"></div></div>';
     try {
       const counts = await Promise.all([
-        DK.db.count('projects').catch(() => ({ count: 0 })),
-        DK.db.count('tickets', { eq: { status: 'OPEN' } }).catch(() => ({ count: 0 })),
-        DK.db.count('team_applications', { eq: { status: 'PENDING' } }).catch(() => ({ count: 0 })),
-        DK.db.count('products', { eq: { is_published: true } }).catch(() => ({ count: 0 })),
-        DK.db.count('orders').catch(() => ({ count: 0 })),
-        DK.db.count('news', { eq: { status: 'PUBLISHED' } }).catch(() => ({ count: 0 })),
+        DK.db.count("projects").catch(() => ({ count: 0 })),
+        DK.db.count("tickets", { eq: { status: "OPEN" } }).catch(() => ({ count: 0 })),
+        DK.db.count("team_applications", { eq: { status: "PENDING" } }).catch(() => ({ count: 0 })),
+        DK.db.count("products", { eq: { is_published: true } }).catch(() => ({ count: 0 })),
+        DK.db.count("orders").catch(() => ({ count: 0 })),
+        DK.db.count("news", { eq: { status: "PUBLISHED" } }).catch(() => ({ count: 0 })),
       ]);
-      const labels = ['پروژه‌ها', 'تیکت باز', 'عضویت جدید', 'محصول منتشر', 'سفارش‌ها', 'اخبار'];
-      el.innerHTML = `<div class="dash-stats">${counts.map((c, i) => `
-        <div class="dash-stat">
-          <div class="dash-stat-value">${(c.count || 0).toLocaleString('fa-IR')}</div>
-          <div class="dash-stat-label">${labels[i]}</div>
-        </div>`).join('')}</div>
-        <p class="text-muted" style="font-size:.85rem">آمار از دیتابیس واقعی Supabase خوانده می‌شود. اعداد صفر ممکن است به‌معنای خالی بودن جدول یا نبود migration باشد.</p>`;
+      const labels = ["پروژه‌ها", "تیکت باز", "عضویت جدید", "محصول منتشر", "سفارش‌ها", "اخبار"];
+      el.innerHTML = '<div class="dash-stats">' + counts.map((c, i) =>
+        '<div class="dash-stat"><div class="dash-stat-value">' + (c.count || 0).toLocaleString("fa-IR") +
+        '</div><div class="dash-stat-label">' + labels[i] + '</div></div>'
+      ).join("") + '</div>';
     } catch (e) {
       el.innerHTML = '<p class="text-muted">خطا در بارگذاری آمار</p>';
     }
   },
 
   async loadTickets() {
-    const el = document.getElementById('panel-tickets');
+    const el = document.getElementById("panel-tickets");
+    if (!el) return;
     el.innerHTML = '<div class="loading-state"><div class="spinner"></div></div>';
     try {
-      const { data } = await DK.supabase.from('tickets').select('*').order('created_at', { ascending: false }).limit(50);
-      if (!data?.length) { el.innerHTML = '<div class="empty-state"><p>تیکتی نیست</p></div>'; return; }
-      const st = { OPEN: 'باز', IN_PROGRESS: 'بررسی', WAITING: 'منتظر', CLOSED: 'بسته' };
-      el.innerHTML = `<div style="overflow-x:auto"><table class="dash-table">
-        <thead><tr><th>موضوع</th><th>نام</th><th>وضعیت</th><th>تاریخ</th><th></th></tr></thead>
-        <tbody>${data.map(t => `
-          <tr>
-            <td>${DK.escape(t.subject)}</td>
-            <td>${DK.escape(t.creator_name)}</td>
-            <td><span class="badge">${st[t.status] || t.status}</span></td>
-            <td>${DK.formatDate(t.created_at)}</td>
-            <td><a class="btn btn-ghost btn-sm" href="support.html?token=${encodeURIComponent(t.access_token)}" target="_blank">مشاهده</a></td>
-          </tr>`).join('')}</tbody></table></div>`;
+      const { data } = await DK.supabase.from("tickets").select("*").order("created_at", { ascending: false }).limit(50);
+      if (!data || !data.length) { el.innerHTML = '<div class="empty-state"><p>تیکتی نیست</p></div>'; return; }
+      const st = { OPEN: "باز", IN_PROGRESS: "بررسی", WAITING: "منتظر", CLOSED: "بسته" };
+      el.innerHTML = '<div style="overflow-x:auto"><table class="dash-table"><thead><tr><th>موضوع</th><th>نام</th><th>وضعیت</th><th></th></tr></thead><tbody>' +
+        data.map((t) => "<tr><td>" + this.escape(t.subject) + "</td><td>" + this.escape(t.creator_name) +
+          "</td><td>" + (st[t.status] || t.status) + '</td><td><a class="btn btn-ghost btn-sm" href="support.html?token=' +
+          encodeURIComponent(t.access_token) + '" target="_blank">مشاهده</a></td></tr>').join("") +
+        "</tbody></table></div>";
     } catch (e) {
-      el.innerHTML = `<p class="form-error">${DK.escape(e.message)}</p>`;
+      el.innerHTML = '<p class="form-error">' + this.escape(e.message) + "</p>";
     }
   },
 
   async loadMemberships() {
-    const el = document.getElementById('panel-memberships');
+    const el = document.getElementById("panel-memberships");
+    if (!el) return;
     el.innerHTML = '<div class="loading-state"><div class="spinner"></div></div>';
     try {
-      const { data } = await DK.supabase.from('team_applications').select('*').order('created_at', { ascending: false }).limit(50);
-      if (!data?.length) { el.innerHTML = '<div class="empty-state"><p>درخواستی نیست</p></div>'; return; }
-      el.innerHTML = `<div style="overflow-x:auto"><table class="dash-table">
-        <thead><tr><th>نام</th><th>موبایل</th><th>مهارت</th><th>وضعیت</th><th>تاریخ</th><th></th></tr></thead>
-        <tbody>${data.map(m => `
-          <tr>
-            <td>${DK.escape(m.name)}</td>
-            <td dir="ltr">${DK.escape(m.mobile || m.contact || '—')}</td>
-            <td>${DK.escape((m.skills || '').slice(0, 40))}</td>
-            <td><span class="badge">${DK.escape(m.status)}</span></td>
-            <td>${DK.formatDate(m.created_at)}</td>
-            <td>
-              <button class="btn btn-sm btn-primary" data-accept="${m.id}">پذیرش</button>
-              <button class="btn btn-sm btn-ghost" data-reject="${m.id}">رد</button>
-            </td>
-          </tr>`).join('')}</tbody></table></div>`;
-      el.querySelectorAll('[data-accept]').forEach(btn => btn.onclick = async () => {
-        await DK.supabase.from('team_applications').update({ status: 'ACCEPTED' }).eq('id', btn.dataset.accept);
-        DK.toast('پذیرفته شد', 'success');
-        this.loadMemberships();
+      const { data } = await DK.supabase.from("team_applications").select("*").order("created_at", { ascending: false }).limit(50);
+      if (!data || !data.length) { el.innerHTML = '<div class="empty-state"><p>درخواستی نیست</p></div>'; return; }
+      el.innerHTML = '<div style="overflow-x:auto"><table class="dash-table"><thead><tr><th>نام</th><th>موبایل</th><th>وضعیت</th><th></th></tr></thead><tbody>' +
+        data.map((m) => "<tr><td>" + this.escape(m.name) + '</td><td dir="ltr">' + this.escape(m.mobile || m.contact || "—") +
+          "</td><td>" + this.escape(m.status) + '</td><td><button class="btn btn-sm btn-primary" data-accept="' + m.id +
+          '">پذیرش</button> <button class="btn btn-sm btn-ghost" data-reject="' + m.id + '">رد</button></td></tr>').join("") +
+        "</tbody></table></div>";
+      el.querySelectorAll("[data-accept]").forEach((btn) => {
+        btn.onclick = async () => {
+          await DK.supabase.from("team_applications").update({ status: "ACCEPTED" }).eq("id", btn.dataset.accept);
+          this.loadMemberships();
+        };
       });
-      el.querySelectorAll('[data-reject]').forEach(btn => btn.onclick = async () => {
-        await DK.supabase.from('team_applications').update({ status: 'REJECTED' }).eq('id', btn.dataset.reject);
-        DK.toast('رد شد', 'info');
-        this.loadMemberships();
+      el.querySelectorAll("[data-reject]").forEach((btn) => {
+        btn.onclick = async () => {
+          await DK.supabase.from("team_applications").update({ status: "REJECTED" }).eq("id", btn.dataset.reject);
+          this.loadMemberships();
+        };
       });
     } catch (e) {
-      el.innerHTML = `<p class="form-error">${DK.escape(e.message)}</p>`;
+      el.innerHTML = '<p class="form-error">' + this.escape(e.message) + "</p>";
     }
   },
 
   async loadProjects() {
-    const el = document.getElementById('panel-projects');
+    const el = document.getElementById("panel-projects");
+    if (!el) return;
     el.innerHTML = '<div class="loading-state"><div class="spinner"></div></div>';
     try {
-      const { data } = await DK.supabase.from('projects').select('id,title,status,version,updated_at').order('display_order');
-      el.innerHTML = !data?.length
+      const { data } = await DK.supabase.from("projects").select("id,title,status,version").order("display_order");
+      el.innerHTML = !data || !data.length
         ? '<div class="empty-state"><p>پروژه‌ای نیست</p></div>'
-        : `<table class="dash-table"><thead><tr><th>عنوان</th><th>وضعیت</th><th>نسخه</th><th>به‌روزرسانی</th></tr></thead>
-           <tbody>${data.map(p => `<tr><td>${DK.escape(p.title)}</td><td>${DK.escape(p.status)}</td><td>${DK.escape(p.version || '')}</td><td>${DK.formatDate(p.updated_at)}</td></tr>`).join('')}</tbody></table>`;
+        : '<table class="dash-table"><thead><tr><th>عنوان</th><th>وضعیت</th><th>نسخه</th></tr></thead><tbody>' +
+          data.map((p) => "<tr><td>" + this.escape(p.title) + "</td><td>" + this.escape(p.status) + "</td><td>" + this.escape(p.version || "") + "</td></tr>").join("") +
+          "</tbody></table>";
     } catch (e) {
-      el.innerHTML = `<p class="form-error">${DK.escape(e.message)}</p>`;
+      el.innerHTML = '<p class="form-error">' + this.escape(e.message) + "</p>";
     }
   },
 
   async loadProducts() {
-    const el = document.getElementById('panel-products');
-    el.innerHTML = '<div class="loading-state"><div class="spinner"></div></div>';
+    const el = document.getElementById("panel-products");
+    if (!el) return;
+    el.innerHTML = '<div class="empty-state"><p>محصولات (نیاز به migration 004)</p></div>';
     try {
-      const { data, error } = await DK.supabase.from('products').select('id,name,price,sale_price,is_published,slug').order('created_at', { ascending: false }).limit(50);
+      const { data, error } = await DK.supabase.from("products").select("id,name,price,is_published").limit(50);
       if (error) throw error;
-      el.innerHTML = !data?.length
-        ? '<div class="empty-state"><p>محصولی نیست. ابتدا migration 004 را اجرا کنید و محصول اضافه کنید.</p></div>'
-        : `<table class="dash-table"><thead><tr><th>نام</th><th>قیمت</th><th>منتشر</th><th></th></tr></thead>
-           <tbody>${data.map(p => `<tr>
-             <td>${DK.escape(p.name)}</td>
-             <td>${DK.formatPrice(p.sale_price ?? p.price)}</td>
-             <td>${p.is_published ? 'بله' : 'خیر'}</td>
-             <td><a class="btn btn-ghost btn-sm" href="product.html?slug=${encodeURIComponent(p.slug)}">مشاهده</a></td>
-           </tr>`).join('')}</tbody></table>`;
-    } catch (e) {
-      el.innerHTML = `<div class="empty-state"><p>جدول products در دسترس نیست. migration 004 را در Supabase اجرا کنید.</p><p class="text-muted" style="font-size:.85rem">${DK.escape(e.message)}</p></div>`;
-    }
+      if (!data || !data.length) return;
+      el.innerHTML = '<table class="dash-table"><thead><tr><th>نام</th><th>قیمت</th><th>منتشر</th></tr></thead><tbody>' +
+        data.map((p) => "<tr><td>" + this.escape(p.name) + "</td><td>" + p.price + "</td><td>" + (p.is_published ? "بله" : "خیر") + "</td></tr>").join("") +
+        "</tbody></table>";
+    } catch (_) {}
   },
 
   async loadOrders() {
-    const el = document.getElementById('panel-orders');
-    el.innerHTML = '<div class="loading-state"><div class="spinner"></div></div>';
+    const el = document.getElementById("panel-orders");
+    if (!el) return;
+    el.innerHTML = '<div class="empty-state"><p>سفارشی نیست</p></div>';
     try {
-      const { data, error } = await DK.supabase.from('orders').select('*').order('created_at', { ascending: false }).limit(50);
-      if (error) throw error;
-      el.innerHTML = !data?.length
-        ? '<div class="empty-state"><p>سفارشی ثبت نشده</p></div>'
-        : `<table class="dash-table"><thead><tr><th>شماره</th><th>وضعیت</th><th>پرداخت</th><th>مبلغ</th><th>تاریخ</th></tr></thead>
-           <tbody>${data.map(o => `<tr>
-             <td>${DK.escape(o.order_number)}</td>
-             <td>${DK.escape(o.status)}</td>
-             <td>${DK.escape(o.payment_status)}</td>
-             <td>${DK.formatPrice(o.total)}</td>
-             <td>${DK.formatDate(o.created_at)}</td>
-           </tr>`).join('')}</tbody></table>`;
-    } catch (e) {
-      el.innerHTML = `<div class="empty-state"><p>جدول orders آماده نیست (migration 004).</p></div>`;
-    }
+      const { data, error } = await DK.supabase.from("orders").select("*").limit(50);
+      if (error || !data || !data.length) return;
+      el.innerHTML = '<table class="dash-table"><thead><tr><th>شماره</th><th>وضعیت</th><th>مبلغ</th></tr></thead><tbody>' +
+        data.map((o) => "<tr><td>" + this.escape(o.order_number) + "</td><td>" + this.escape(o.status) + "</td><td>" + o.total + "</td></tr>").join("") +
+        "</tbody></table>";
+    } catch (_) {}
   },
 
   async loadNews() {
-    const el = document.getElementById('panel-news');
+    const el = document.getElementById("panel-news");
+    if (!el) return;
     el.innerHTML = '<div class="loading-state"><div class="spinner"></div></div>';
     try {
-      const { data } = await DK.supabase.from('news').select('id,title,status,published_at').order('created_at', { ascending: false }).limit(30);
-      el.innerHTML = !data?.length
+      const { data } = await DK.supabase.from("news").select("id,title,status").order("created_at", { ascending: false }).limit(30);
+      el.innerHTML = !data || !data.length
         ? '<div class="empty-state"><p>خبری نیست</p></div>'
-        : `<table class="dash-table"><thead><tr><th>عنوان</th><th>وضعیت</th><th>انتشار</th></tr></thead>
-           <tbody>${data.map(n => `<tr><td>${DK.escape(n.title)}</td><td>${DK.escape(n.status)}</td><td>${DK.formatDate(n.published_at)}</td></tr>`).join('')}</tbody></table>`;
+        : '<table class="dash-table"><thead><tr><th>عنوان</th><th>وضعیت</th></tr></thead><tbody>' +
+          data.map((n) => "<tr><td>" + this.escape(n.title) + "</td><td>" + this.escape(n.status) + "</td></tr>").join("") +
+          "</tbody></table>";
     } catch (e) {
-      el.innerHTML = `<p class="form-error">${DK.escape(e.message)}</p>`;
+      el.innerHTML = '<p class="form-error">' + this.escape(e.message) + "</p>";
     }
   }
 };
 
-document.addEventListener('DOMContentLoaded', () => Admin.init());
+document.addEventListener("DOMContentLoaded", () => Admin.init());
