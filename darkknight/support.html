@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>پشتیبانی | Darkknight Studio دارک‌نایت استودیو</title>
+  <meta name="description" content="مرکز پشتیبانی Darkknight Studio — ثبت تیکت و پیگیری. دارک‌نایت استودیو.">
+  <meta name="keywords" content="پشتیبانی Darkknight, تیکت دارک‌نایت, support ticket">
+  <meta name="theme-color" content="#050508">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <style>
+    .support-wrap { max-width:640px; margin:0 auto; }
+    .ticket-view { display:none; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">⚔</span><span class="logo-text">DARKKNIGHT</span></a>
+      <nav class="nav" id="nav">
+        <a href="index.html" class="nav-link">خانه</a>
+        <a href="shop.html" class="nav-link">فروشگاه</a>
+        <a href="projects.html" class="nav-link">پروژه‌ها</a>
+        <a href="membership.html" class="nav-link">عضویت</a>
+        <a href="support.html" class="nav-link active">پشتیبانی</a>
+        <a href="contact.html" class="nav-link">تماس</a>
+      </nav>
+      <div class="header-actions">
+        <div class="header-auth" id="auth-slot"></div>
+        <button class="menu-toggle" id="menu-toggle" aria-label="منو"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container section">
+    <div class="support-wrap">
+      <div class="section-header" style="text-align:right;margin-bottom:1.5rem">
+        <h1>مرکز پشتیبانی</h1>
+        <p>تیکت جدید بسازید یا با توکن دسترسی، تیکت قبلی را پیگیری کنید.</p>
+      </div>
+
+      <!-- Create ticket -->
+      <div class="card" id="create-panel">
+        <h2 style="font-size:1.1rem;margin-bottom:1rem">ثبت تیکت جدید</h2>
+        <form id="ticket-form">
+          <div class="form-group">
+            <label for="t-name">نام شما *</label>
+            <input type="text" id="t-name" name="creator_name" required maxlength="80">
+          </div>
+          <div class="form-group">
+            <label for="t-email">ایمیل (اختیاری)</label>
+            <input type="email" id="t-email" name="creator_email" dir="ltr">
+          </div>
+          <div class="form-group">
+            <label for="t-subject">موضوع *</label>
+            <input type="text" id="t-subject" name="subject" required maxlength="120">
+          </div>
+          <div class="form-group">
+            <label for="t-cat">دسته‌بندی</label>
+            <select id="t-cat" name="category">
+              <option value="general">عمومی</option>
+              <option value="shop">فروشگاه / سفارش</option>
+              <option value="technical">فنی</option>
+              <option value="membership">عضویت</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="t-msg">پیام *</label>
+            <textarea id="t-msg" name="message" rows="5" required></textarea>
+          </div>
+          <p class="form-error" id="ticket-error"></p>
+          <button type="submit" class="btn btn-primary" style="width:100%">ارسال تیکت</button>
+        </form>
+      </div>
+
+      <!-- Track by token -->
+      <div class="card" style="margin-top:1.25rem" id="track-panel">
+        <h2 style="font-size:1.1rem;margin-bottom:1rem">پیگیری تیکت</h2>
+        <form id="track-form" style="display:flex;gap:.5rem;flex-wrap:wrap">
+          <input type="text" id="track-token" name="token" placeholder="توکن دسترسی تیکت" dir="ltr" style="flex:1;min-width:180px" required>
+          <button type="submit" class="btn btn-ghost">مشاهده</button>
+        </form>
+      </div>
+
+      <!-- Ticket conversation -->
+      <div class="ticket-view" id="ticket-view">
+        <div class="card" style="margin-top:1.25rem">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem">
+            <h2 style="font-size:1.1rem;margin:0" id="tv-subject"></h2>
+            <span class="badge" id="tv-status"></span>
+          </div>
+          <div id="tv-messages" style="display:flex;flex-direction:column;gap:.75rem;margin-bottom:1rem;max-height:400px;overflow-y:auto"></div>
+          <form id="reply-form">
+            <div class="form-group">
+              <textarea id="reply-msg" rows="3" placeholder="پاسخ شما…" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">ارسال پاسخ</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-bottom">
+      <span>© <span id="year"></span> Darkknight Studio</span>
+      <a href="index.html">خانه</a>
+    </div>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/support.js"></script>
+</body>
+</html>
