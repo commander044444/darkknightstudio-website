@@ -7,10 +7,79 @@ const Admin = {
 
   async init() {
     if (!DK.isConfigured) DK.initSupabase();
-    this.admin = await AuthUI.requireAdmin();
-    if (!this.admin) return;
+
+    // Always require explicit session check — show login form if not admin
+    const user = await DK.getUser();
+    if (!user) {
+      this.renderLoginForm();
+      return;
+    }
+
+    this.admin = await DK.getAdminProfile();
+    if (!this.admin) {
+      this.renderLoginForm('این حساب دسترسی مدیریت ندارد. با ایمیل و رمز ادمین وارد شوید.');
+      await DK.signOut();
+      return;
+    }
+
     this.renderShell();
     await this.loadDashboard();
+  },
+
+  renderLoginForm(errorMsg) {
+    document.getElementById('admin-app').innerHTML = `
+      <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem;background:var(--bg-deep)">
+        <div class="card" style="width:100%;max-width:400px">
+          <div style="text-align:center;margin-bottom:1.25rem">
+            <div style="font-size:2rem;margin-bottom:.5rem">⚔</div>
+            <h1 style="font-size:1.25rem;margin-bottom:.25rem">پنل مدیریت</h1>
+            <p class="text-muted" style="font-size:.9rem">Darkknight Studio — ورود ادمین</p>
+          </div>
+          <form id="admin-login-form">
+            <div class="form-group">
+              <label for="admin-email">ایمیل</label>
+              <input type="email" id="admin-email" name="email" required autocomplete="username" dir="ltr" placeholder="admin@example.com">
+            </div>
+            <div class="form-group">
+              <label for="admin-password">رمز عبور</label>
+              <input type="password" id="admin-password" name="password" required autocomplete="current-password" dir="ltr" minlength="6">
+            </div>
+            <p class="form-error" id="admin-login-error">${errorMsg ? DK.escape(errorMsg) : ''}</p>
+            <button type="submit" class="btn btn-primary" style="width:100%">ورود به پنل</button>
+          </form>
+          <p style="text-align:center;margin-top:1rem">
+            <a href="index.html" class="btn btn-ghost btn-sm">بازگشت به سایت</a>
+          </p>
+        </div>
+      </div>`;
+
+    document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const errEl = document.getElementById('admin-login-error');
+      const btn = form.querySelector('[type="submit"]');
+      errEl.textContent = '';
+      DK.setLoading(btn, true);
+      try {
+        await DK.signIn(form.email.value.trim(), form.password.value);
+        const admin = await DK.getAdminProfile();
+        if (!admin) {
+          await DK.signOut();
+          errEl.textContent = 'این حساب دسترسی مدیریت ندارد.';
+          DK.toast('دسترسی مجاز نیست', 'error');
+          return;
+        }
+        DK.toast('ورود موفق', 'success');
+        this.admin = admin;
+        this.renderShell();
+        await this.loadDashboard();
+      } catch (err) {
+        errEl.textContent = err.message || 'ایمیل یا رمز عبور اشتباه است';
+        DK.toast(err.message || 'خطا در ورود', 'error');
+      } finally {
+        DK.setLoading(btn, false);
+      }
+    });
   },
 
   renderShell() {
@@ -58,7 +127,9 @@ const Admin = {
     document.getElementById('admin-logout')?.addEventListener('click', async (e) => {
       e.preventDefault();
       await DK.signOut();
-      location.href = 'login.html';
+      this.admin = null;
+      this.renderLoginForm();
+      DK.toast('از پنل خارج شدید', 'info');
     });
   },
 
