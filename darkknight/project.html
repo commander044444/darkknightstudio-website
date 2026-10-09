@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>پروژه | Darkknight Studio</title>
+  <meta name="theme-color" content="#050508">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">⚔</span><span class="logo-text">DARKKNIGHT</span></a>
+      <nav class="nav" id="nav">
+        <a href="index.html" class="nav-link">خانه</a>
+        <a href="shop.html" class="nav-link">فروشگاه</a>
+        <a href="projects.html" class="nav-link active">پروژه‌ها</a>
+        <a href="support.html" class="nav-link">پشتیبانی</a>
+      </nav>
+      <div class="header-actions">
+        <div class="header-auth" id="auth-slot"></div>
+        <button class="menu-toggle" id="menu-toggle" aria-label="منو"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container section" id="project-root">
+    <div class="loading-state"><div class="spinner"></div><p>در حال بارگذاری…</p></div>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    const toggle = document.getElementById('menu-toggle');
+    const nav = document.getElementById('nav');
+    if (toggle && nav) toggle.onclick = () => { nav.classList.toggle('open'); toggle.classList.toggle('open'); };
+
+    (async () => {
+      if (!DK.isConfigured) DK.initSupabase();
+      const id = DK.query.get('id');
+      const root = document.getElementById('project-root');
+      if (!id) {
+        root.innerHTML = '<div class="empty-state"><p>پروژه مشخص نشده</p><a class="btn btn-ghost" href="projects.html">بازگشت</a></div>';
+        return;
+      }
+      try {
+        const { data: p, error } = await DK.supabase
+          .from('projects')
+          .select('*')
+          .eq('id', id)
+          .maybeSingle();
+        if (error) throw error;
+        if (!p) {
+          root.innerHTML = '<div class="empty-state"><p>پروژه یافت نشد</p><a class="btn btn-ghost" href="projects.html">بازگشت</a></div>';
+          return;
+        }
+        document.title = DK.escape(p.title) + ' | Darkknight Studio';
+        const statusLabel = { ONLINE: 'آنلاین', OFFLINE: 'آفلاین', IN_DEVELOPMENT: 'در حال توسعه', ARCHIVED: 'آرشیو' };
+        root.innerHTML = `
+          <a href="projects.html" class="btn btn-ghost btn-sm" style="margin-bottom:1rem">← بازگشت به پروژه‌ها</a>
+          ${p.banner_url ? `<img src="${DK.escape(p.banner_url)}" alt="" style="width:100%;max-height:320px;object-fit:cover;border-radius:var(--radius-lg);margin-bottom:1.5rem" loading="lazy">` : ''}
+          <div style="display:flex;flex-wrap:wrap;gap:1rem;align-items:center;margin-bottom:1rem">
+            <h1 style="margin:0">${DK.escape(p.title)}</h1>
+            <span class="badge">${statusLabel[p.status] || p.status}</span>
+            ${p.version ? `<span class="card-meta">v${DK.escape(p.version)}</span>` : ''}
+          </div>
+          <div class="card" style="margin-bottom:1.5rem">
+            <p style="white-space:pre-wrap;color:var(--text-secondary)">${DK.escape(p.description || 'بدون توضیحات')}</p>
+          </div>
+          ${(p.technologies && p.technologies.length) ? `<p class="text-muted" style="margin-bottom:1rem"><strong>تکنولوژی‌ها:</strong> ${p.technologies.map(t => DK.escape(t)).join(' · ')}</p>` : ''}
+          ${(p.tags && p.tags.length) ? `<p>${p.tags.map(t => `<span class="badge" style="margin:0 .25rem">${DK.escape(t)}</span>`).join('')}</p>` : ''}
+        `;
+      } catch (e) {
+        root.innerHTML = '<div class="empty-state"><p>خطا در بارگذاری</p></div>';
+        console.error(e);
+      }
+    })();
+  </script>
+</body>
+</html>
