@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>محصول | Darkknight Shop</title>
+  <meta name="theme-color" content="#050508">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <style>
+    .product-layout { display:grid; grid-template-columns:1fr 1fr; gap:2rem; }
+    @media (max-width:768px) { .product-layout { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">⚔</span><span class="logo-text">DARKKNIGHT</span></a>
+      <nav class="nav" id="nav">
+        <a href="index.html" class="nav-link">خانه</a>
+        <a href="shop.html" class="nav-link active">فروشگاه</a>
+        <a href="projects.html" class="nav-link">پروژه‌ها</a>
+        <a href="support.html" class="nav-link">پشتیبانی</a>
+      </nav>
+      <div class="header-actions">
+        <div class="header-auth" id="auth-slot"></div>
+        <button class="menu-toggle" id="menu-toggle" aria-label="منو"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container section" id="product-root">
+    <div class="loading-state"><div class="spinner"></div><p>در حال بارگذاری…</p></div>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/cart.js"></script>
+  <script>
+    const toggle = document.getElementById('menu-toggle');
+    const nav = document.getElementById('nav');
+    if (toggle && nav) toggle.onclick = () => { nav.classList.toggle('open'); toggle.classList.toggle('open'); };
+
+    (async () => {
+      if (!DK.isConfigured) DK.initSupabase();
+      const slug = DK.query.get('slug');
+      const root = document.getElementById('product-root');
+      if (!slug) {
+        root.innerHTML = '<div class="empty-state"><p>محصول مشخص نشده</p><a class="btn btn-ghost" href="shop.html">فروشگاه</a></div>';
+        return;
+      }
+      try {
+        const { data: p, error } = await DK.supabase
+          .from('products')
+          .select('*, product_categories(name,slug)')
+          .eq('slug', slug)
+          .eq('is_published', true)
+          .maybeSingle();
+        if (error) throw error;
+        if (!p) {
+          root.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📦</div><p>محصول یافت نشد یا منتشر نشده</p><a class="btn btn-ghost" href="shop.html">بازگشت به فروشگاه</a></div>';
+          return;
+        }
+        document.title = p.name + ' | Darkknight Shop';
+        const price = p.sale_price != null ? p.sale_price : p.price;
+        root.innerHTML = `
+          <a href="shop.html" class="btn btn-ghost btn-sm" style="margin-bottom:1rem">← فروشگاه</a>
+          <div class="product-layout">
+            <div>
+              ${p.cover_url
+                ? `<img src="${DK.escape(p.cover_url)}" alt="${DK.escape(p.name)}" style="width:100%;border-radius:var(--radius-lg);border:1px solid var(--border)" loading="lazy">`
+                : `<div style="aspect-ratio:16/10;background:var(--bg-secondary);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;font-size:3rem;opacity:.4">⚔</div>`}
+            </div>
+            <div>
+              ${p.product_categories ? `<span class="badge" style="margin-bottom:.75rem">${DK.escape(p.product_categories.name)}</span>` : ''}
+              <h1 style="margin-bottom:.75rem">${DK.escape(p.name)}</h1>
+              <p class="text-muted" style="margin-bottom:1rem">${DK.escape(p.short_description || '')}</p>
+              <div class="product-price" style="font-size:1.35rem;margin-bottom:1.25rem">
+                ${p.sale_price != null
+                  ? `<span>${DK.formatPrice(p.sale_price)}</span><span class="price-old">${DK.formatPrice(p.price)}</span>`
+                  : `<span>${DK.formatPrice(p.price)}</span>`}
+              </div>
+              ${p.version ? `<p class="card-meta" style="margin-bottom:1rem">نسخه ${DK.escape(p.version)}</p>` : ''}
+              <button type="button" class="btn btn-primary btn-lg" id="btn-add-cart" data-id="${p.id}" data-name="${DK.escape(p.name)}" data-price="${price}">افزودن به سبد</button>
+              <div class="card" style="margin-top:1.5rem">
+                <h3 style="margin-bottom:.75rem">توضیحات</h3>
+                <div style="white-space:pre-wrap;color:var(--text-secondary);font-size:.95rem">${DK.escape(p.description || '—')}</div>
+              </div>
+              ${(p.features && p.features.length) ? `
+                <div class="card" style="margin-top:1rem">
+                  <h3 style="margin-bottom:.75rem">قابلیت‌ها</h3>
+                  <ul style="padding-right:1.25rem;list-style:disc;color:var(--text-secondary)">
+                    ${p.features.map(f => `<li>${DK.escape(f)}</li>`).join('')}
+                  </ul>
+                </div>` : ''}
+            </div>
+          </div>`;
+
+        document.getElementById('btn-add-cart')?.addEventListener('click', async (e) => {
+          const btn = e.currentTarget;
+          DK.setLoading(btn, true);
+          try {
+            await Cart.add(btn.dataset.id, 1);
+            DK.toast('به سبد اضافه شد', 'success');
+          } catch (err) {
+            DK.toast(err.message || 'خطا', 'error');
+          } finally {
+            DK.setLoading(btn, false);
+          }
+        });
+      } catch (e) {
+        console.error(e);
+        root.innerHTML = '<div class="empty-state"><p>خطا در بارگذاری محصول. ممکن است جدول products هنوز ساخته نشده باشد (migration 004).</p><a class="btn btn-ghost" href="shop.html">فروشگاه</a></div>';
+      }
+    })();
+  </script>
+</body>
+</html>
