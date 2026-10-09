@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>پنل مدیریت | Darkknight Studio</title>
+  <title>ورود به پنل مدیریت | Darkknight Studio</title>
   <meta name="robots" content="noindex, nofollow">
   <meta name="theme-color" content="#050508">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔</text></svg>">
@@ -12,21 +12,70 @@
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/responsive.css">
   <link rel="stylesheet" href="css/dashboard.css">
+  <style>
+    .admin-login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      background: var(--bg-deep, #050508);
+      color: var(--text-primary, #f0f0f5);
+      font-family: Vazirmatn, system-ui, sans-serif;
+    }
+    .admin-login-card {
+      width: 100%;
+      max-width: 400px;
+      background: var(--bg-card, rgba(26,26,36,0.9));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+    .admin-login-card h1 { font-size: 1.25rem; margin: 0 0 0.25rem; text-align: center; }
+    .admin-login-card .sub { text-align: center; color: #a0a0b0; font-size: 0.9rem; margin-bottom: 1.25rem; }
+    .admin-login-card label { display: block; margin-bottom: 0.35rem; font-size: 0.875rem; color: #a0a0b0; }
+    .admin-login-card input {
+      width: 100%; padding: 0.65rem 0.9rem; margin-bottom: 1rem;
+      background: #12121a; border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px; color: #f0f0f5; font-size: 1rem; box-sizing: border-box;
+    }
+    .admin-login-card input:focus { outline: none; border-color: #c8c8d8; }
+    .admin-login-card .btn-submit {
+      width: 100%; padding: 0.75rem; border: none; border-radius: 10px;
+      background: #c8c8d8; color: #0a0a0f; font-weight: 700; font-size: 0.95rem;
+      cursor: pointer; font-family: inherit;
+    }
+    .admin-login-card .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+    .admin-login-card .error { color: #ef4444; font-size: 0.85rem; margin: 0 0 0.75rem; min-height: 1.2em; }
+    .admin-login-card .back { text-align: center; margin-top: 1rem; }
+    .admin-login-card .back a { color: #a0a0b0; text-decoration: none; font-size: 0.85rem; }
+    #admin-dashboard { display: none; }
+  </style>
 </head>
 <body>
-  <div id="admin-app">
-    <div class="loading-state" style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center">
-      <div class="spinner"></div>
-      <p>بررسی دسترسی…</p>
+  <div id="admin-login-screen" class="admin-login-screen">
+    <div class="admin-login-card">
+      <div style="text-align:center;font-size:2rem;margin-bottom:0.5rem">⚔</div>
+      <h1>پنل مدیریت</h1>
+      <p class="sub">Darkknight Studio — ورود با ایمیل و رمز عبور</p>
+      <form id="admin-login-form" autocomplete="on">
+        <label for="admin-email">ایمیل</label>
+        <input type="email" id="admin-email" name="email" required autocomplete="username" dir="ltr" placeholder="admin@example.com">
+        <label for="admin-password">رمز عبور</label>
+        <input type="password" id="admin-password" name="password" required autocomplete="current-password" dir="ltr" minlength="6" placeholder="••••••••">
+        <p class="error" id="admin-login-error" role="alert"></p>
+        <button type="submit" class="btn-submit" id="admin-login-btn">ورود به پنل</button>
+      </form>
+      <p class="back"><a href="index.html">بازگشت به سایت</a></p>
     </div>
   </div>
+  <div id="admin-dashboard"></div>
 
   <script src="js/config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/utils.js"></script>
   <script src="js/supabase.js"></script>
   <script src="js/permissions.js"></script>
-  <script src="js/auth.js"></script>
   <script src="js/admin.js"></script>
 </body>
 </html>
