@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>فروشگاه Darkknight Shop | خرید ربات، سورس‌کد و پروژه دیجیتال — دارک‌نایت استودیو</title>
+  <meta name="description" content="فروشگاه دیجیتال Darkknight Studio — خرید ربات تلگرام، ربات پیام‌رسان، ربات مدیریتی، سورس‌کد، پروژه آماده، وب‌سایت و ابزار توسعه‌دهندگان. Darkknight Shop digital products.">
+  <meta name="keywords" content="فروشگاه Darkknight, خرید ربات تلگرام, سورس کد, پروژه آماده, Darkknight Shop, messenger bot store, source code marketplace, دارک‌نایت فروشگاه">
+  <meta name="theme-color" content="#050508">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <style>
+    .shop-layout { display:grid; grid-template-columns:240px 1fr; gap:1.5rem; padding:2rem 0; }
+    .shop-sidebar { position:sticky; top:calc(var(--header-h) + 1rem); align-self:start; }
+    .filter-list a { display:block; padding:0.5rem 0.75rem; border-radius:var(--radius-sm); font-size:0.9rem; color:var(--text-secondary); }
+    .filter-list a:hover, .filter-list a.active { background:var(--accent-dim); color:var(--text-primary); }
+    .shop-toolbar { display:flex; flex-wrap:wrap; gap:0.75rem; margin-bottom:1.25rem; align-items:center; }
+    .shop-toolbar input { max-width:240px; }
+    @media (max-width:768px) {
+      .shop-layout { grid-template-columns:1fr; }
+      .shop-sidebar { position:static; }
+    }
+  </style>
+</head>
+<body>
+  <div class="seo-keywords" aria-hidden="true">
+    <p>فروشگاه Darkknight Shop خرید ربات تلگرام سورس کد پروژه آماده دارک‌نایت استودیو messenger bots source codes ready projects #DarkknightShop #فروش_ربات</p>
+  </div>
+
+  <header class="header" id="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">⚔</span><span class="logo-text">DARKKNIGHT</span></a>
+      <nav class="nav" id="nav">
+        <a href="index.html" class="nav-link">خانه</a>
+        <a href="shop.html" class="nav-link active">فروشگاه</a>
+        <a href="projects.html" class="nav-link">پروژه‌ها</a>
+        <a href="membership.html" class="nav-link">عضویت</a>
+        <a href="support.html" class="nav-link">پشتیبانی</a>
+      </nav>
+      <div class="header-actions">
+        <div class="header-auth" id="auth-slot"></div>
+        <button class="menu-toggle" id="menu-toggle" aria-label="منو"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container shop-layout">
+    <aside class="shop-sidebar card">
+      <h3 style="font-size:0.95rem;margin-bottom:0.75rem">دسته‌بندی‌ها</h3>
+      <div class="filter-list" id="cat-list">
+        <a href="shop.html" class="active" data-slug="">همه محصولات</a>
+      </div>
+    </aside>
+
+    <div>
+      <div class="shop-toolbar">
+        <h1 style="font-size:1.35rem;margin:0;flex:1">فروشگاه Darkknight</h1>
+        <input type="search" id="shop-search" placeholder="جست‌وجوی محصول…" dir="rtl">
+      </div>
+      <div class="grid grid-3" id="products-grid">
+        <div class="loading-state"><div class="spinner"></div><p>در حال بارگذاری…</p></div>
+      </div>
+      <div id="shop-pagination" style="margin-top:1.5rem;text-align:center"></div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-bottom">
+      <span>© <span id="year"></span> Darkknight Studio</span>
+      <span>Darkknight Shop · فروشگاه دیجیتال</span>
+    </div>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/shop.js"></script>
+</body>
+</html>
