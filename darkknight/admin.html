@@ -3,82 +3,58 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ورود به پنل مدیریت | Darkknight Studio</title>
+  <title>پنل مدیریت | Darkknight Studio</title>
   <meta name="robots" content="noindex, nofollow">
   <meta name="theme-color" content="#050508">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔</text></svg>">
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: Vazirmatn, system-ui, sans-serif;
-      background: #050508;
-      color: #f0f0f5;
-      min-height: 100vh;
-    }
-    .login-wrap {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-    }
-    .card {
-      width: 100%;
-      max-width: 400px;
-      background: rgba(26,26,36,0.95);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 16px;
-      padding: 1.75rem;
-    }
-    .icon { text-align: center; font-size: 2rem; margin-bottom: 0.5rem; }
-    h1 { text-align: center; font-size: 1.25rem; margin-bottom: 0.25rem; }
-    .sub { text-align: center; color: #a0a0b0; font-size: 0.9rem; margin-bottom: 1.25rem; }
-    label { display: block; margin-bottom: 0.35rem; font-size: 0.875rem; color: #a0a0b0; }
-    input {
-      width: 100%;
-      padding: 0.7rem 0.9rem;
-      margin-bottom: 1rem;
-      background: #12121a;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px;
-      color: #f0f0f5;
-      font-size: 1rem;
-      font-family: inherit;
-    }
-    input:focus { outline: none; border-color: #c8c8d8; }
-    .btn {
-      width: 100%;
-      padding: 0.8rem;
-      border: none;
-      border-radius: 10px;
-      background: #c8c8d8;
-      color: #0a0a0f;
-      font-weight: 700;
-      font-size: 0.95rem;
-      cursor: pointer;
-      font-family: inherit;
-    }
-    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .error { color: #ef4444; font-size: 0.85rem; margin-bottom: 0.75rem; min-height: 1.25em; }
-    .back { text-align: center; margin-top: 1rem; }
-    .back a { color: #a0a0b0; text-decoration: none; font-size: 0.85rem; }
-    #dashboard { display: none; }
-    .dash { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
-    .side { background: #0a0a0f; border-left: 1px solid rgba(255,255,255,0.08); padding: 1rem; }
-    .side a { display: block; padding: 0.55rem 0.75rem; color: #a0a0b0; text-decoration: none; border-radius: 8px; font-size: 0.875rem; margin-bottom: 0.15rem; }
-    .side a:hover, .side a.active { background: rgba(200,200,216,0.15); color: #f0f0f5; }
-    .main { padding: 1.5rem; }
-    .stats { display: grid; grid-template-columns: repeat(auto-fill,minmax(140px,1fr)); gap: 1rem; }
-    .stat { background: rgba(26,26,36,0.9); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1rem; }
-    .stat b { font-size: 1.4rem; display: block; }
-    .stat span { font-size: 0.8rem; color: #6a6a7a; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; margin-top: 1rem; }
-    th, td { padding: 0.55rem; border-bottom: 1px solid rgba(255,255,255,0.08); text-align: right; }
-    th { color: #6a6a7a; }
-    .panel { display: none; }
-    .panel.active { display: block; }
-    @media (max-width: 768px) { .dash { grid-template-columns: 1fr; } }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Vazirmatn,system-ui,sans-serif;background:#050508;color:#f0f0f5;min-height:100vh}
+    .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem}
+    .card{width:100%;max-width:400px;background:rgba(26,26,36,.95);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1.75rem}
+    .icon{text-align:center;font-size:2rem;margin-bottom:.5rem}
+    h1{text-align:center;font-size:1.25rem;margin-bottom:.25rem}
+    .sub{text-align:center;color:#a0a0b0;font-size:.9rem;margin-bottom:1.25rem}
+    label{display:block;margin-bottom:.35rem;font-size:.85rem;color:#a0a0b0}
+    input,textarea,select{width:100%;padding:.65rem .85rem;margin-bottom:.85rem;background:#12121a;border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#f0f0f5;font-size:.95rem;font-family:inherit}
+    textarea{min-height:90px;resize:vertical}
+    input:focus,textarea:focus,select:focus{outline:none;border-color:#c8c8d8}
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:.55rem 1rem;border:none;border-radius:10px;font-weight:600;font-size:.875rem;cursor:pointer;font-family:inherit}
+    .btn-primary{background:#c8c8d8;color:#0a0a0f}
+    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,.12);color:#a0a0b0}
+    .btn-danger{background:#ef4444;color:#fff}
+    .btn-sm{padding:.35rem .65rem;font-size:.8rem}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .btn-block{width:100%}
+    .error{color:#ef4444;font-size:.85rem;margin-bottom:.75rem;min-height:1.2em}
+    .ok{color:#3ecf8e;font-size:.85rem;margin-bottom:.75rem}
+    .back{text-align:center;margin-top:1rem}
+    .back a{color:#a0a0b0;text-decoration:none;font-size:.85rem}
+    #dashboard{display:none}
+    .dash{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+    .side{background:#0a0a0f;border-left:1px solid rgba(255,255,255,.08);padding:1rem .75rem;position:sticky;top:0;height:100vh;overflow-y:auto}
+    .side .brand{font-weight:800;padding:.5rem .75rem 1rem;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:.75rem}
+    .side a{display:block;padding:.5rem .75rem;color:#a0a0b0;text-decoration:none;border-radius:8px;font-size:.875rem;margin-bottom:.1rem}
+    .side a:hover,.side a.active{background:rgba(200,200,216,.15);color:#f0f0f5}
+    .side .role{font-size:.75rem;color:#6a6a7a;padding:0 .75rem .75rem}
+    .main{padding:1.25rem 1.5rem;max-width:1100px}
+    .main h2{font-size:1.2rem;margin-bottom:1rem}
+    .toolbar{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem;align-items:center}
+    .stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.75rem;margin-bottom:1.25rem}
+    .stat{background:rgba(26,26,36,.9);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:.9rem}
+    .stat b{font-size:1.35rem;display:block}
+    .stat span{font-size:.75rem;color:#6a6a7a}
+    table{width:100%;border-collapse:collapse;font-size:.85rem}
+    th,td{padding:.55rem .4rem;border-bottom:1px solid rgba(255,255,255,.08);text-align:right;vertical-align:top}
+    th{color:#6a6a7a;font-weight:600}
+    .panel{display:none}
+    .panel.active{display:block}
+    .form-box{background:rgba(26,26,36,.9);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:1.15rem;margin-bottom:1.25rem}
+    .form-box h3{font-size:1rem;margin-bottom:.85rem}
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+    .muted{color:#6a6a7a;font-size:.85rem}
+    .badge{display:inline-block;padding:.15rem .45rem;border-radius:999px;font-size:.7rem;background:rgba(200,200,216,.15);color:#c8c8d8}
+    @media(max-width:768px){.dash{grid-template-columns:1fr}.side{position:static;height:auto}.row2{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -86,14 +62,14 @@
     <div class="card">
       <div class="icon">⚔</div>
       <h1>پنل مدیریت</h1>
-      <p class="sub">Darkknight Studio — ورود با ایمیل و رمز عبور</p>
+      <p class="sub">Darkknight Studio — ورود ادمین</p>
       <form id="login-form">
-        <label for="email">ایمیل</label>
-        <input type="email" id="email" name="email" required autocomplete="username" dir="ltr" placeholder="admin@example.com">
-        <label for="password">رمز عبور</label>
-        <input type="password" id="password" name="password" required autocomplete="current-password" dir="ltr" minlength="6">
-        <p class="error" id="error" role="alert"></p>
-        <button type="submit" class="btn" id="btn">ورود به پنل</button>
+        <label>ایمیل</label>
+        <input type="email" id="email" required dir="ltr" autocomplete="username">
+        <label>رمز عبور</label>
+        <input type="password" id="password" required dir="ltr" minlength="6" autocomplete="current-password">
+        <p class="error" id="error"></p>
+        <button type="submit" class="btn btn-primary btn-block" id="btn">ورود به پنل</button>
       </form>
       <p class="back"><a href="index.html">بازگشت به سایت</a></p>
     </div>
@@ -102,241 +78,491 @@
   <div id="dashboard">
     <div class="dash">
       <aside class="side">
-        <div style="font-weight:800;padding:0.5rem 0.75rem 1rem">⚔ پنل مدیریت</div>
+        <div class="brand">⚔ پنل مدیریت</div>
+        <div class="role" id="admin-role"></div>
         <nav id="nav">
           <a href="#" data-p="dash" class="active">داشبورد</a>
-          <a href="#" data-p="tickets">تیکت‌ها</a>
-          <a href="#" data-p="memberships">عضویت</a>
+          <a href="#" data-p="news">اخبار</a>
+          <a href="#" data-p="products">فروشگاه / محصولات</a>
+          <a href="#" data-p="categories">دسته‌بندی‌ها</a>
           <a href="#" data-p="projects">پروژه‌ها</a>
+          <a href="#" data-p="team">اعضای تیم</a>
+          <a href="#" data-p="tickets">تیکت‌ها</a>
+          <a href="#" data-p="memberships">درخواست عضویت</a>
+          <a href="#" data-p="orders">سفارش‌ها</a>
+          <a href="#" data-p="links">لینک‌های رسمی</a>
+          <a href="#" data-p="settings">تنظیمات سایت</a>
+          <a href="owner.html" id="owner-link" style="display:none">پنل مالک ←</a>
           <a href="index.html">سایت</a>
           <a href="#" id="logout">خروج</a>
         </nav>
       </aside>
       <main class="main">
-        <h2 id="title" style="margin-bottom:1rem;font-size:1.2rem">داشبورد</h2>
+        <h2 id="title">داشبورد</h2>
+        <div id="msg" class="ok"></div>
         <div id="p-dash" class="panel active"></div>
+        <div id="p-news" class="panel"></div>
+        <div id="p-products" class="panel"></div>
+        <div id="p-categories" class="panel"></div>
+        <div id="p-projects" class="panel"></div>
+        <div id="p-team" class="panel"></div>
         <div id="p-tickets" class="panel"></div>
         <div id="p-memberships" class="panel"></div>
-        <div id="p-projects" class="panel"></div>
+        <div id="p-orders" class="panel"></div>
+        <div id="p-links" class="panel"></div>
+        <div id="p-settings" class="panel"></div>
       </main>
     </div>
   </div>
 
-  <script>
-(function () {
-  const SUPABASE_URL = "https://exaryvtjayuwgyqnioem.supabase.co";
-  const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4YXJ5dnRqYXl1d2d5cW5pb2VtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1NzgxMjUsImV4cCI6MjEwNTE1NDEyNX0.qMKyG9gwUTeNbfXhzbSbTEJMEh4Dy-5M3gZ9vXpmsKs";
+<script>
+(function(){
+  var URL = "https://exaryvtjayuwgyqnioem.supabase.co";
+  var KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4YXJ5dnRqYXl1d2d5cW5pb2VtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1NzgxMjUsImV4cCI6MjEwNTE1NDEyNX0.qMKyG9gwUTeNbfXhzbSbTEJMEh4Dy-5M3gZ9vXpmsKs";
+  var session = null, admin = null;
 
-  let session = null;
-  let admin = null;
-
-  function headers(auth) {
-    const h = {
-      "apikey": ANON_KEY,
-      "Content-Type": "application/json"
-    };
-    if (auth && session && session.access_token) {
-      h["Authorization"] = "Bearer " + session.access_token;
-    } else {
-      h["Authorization"] = "Bearer " + ANON_KEY;
-    }
+  function hdr(auth){
+    var h = {"apikey":KEY,"Content-Type":"application/json","Prefer":"return=representation"};
+    h["Authorization"] = "Bearer " + ((auth && session && session.access_token) ? session.access_token : KEY);
     return h;
   }
+  function esc(s){ if(s==null)return""; return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+  function toast(m, isErr){ var el=document.getElementById("msg"); el.className=isErr?"error":"ok"; el.textContent=m; setTimeout(function(){el.textContent="";},4000); }
+  function slugify(t){ return String(t||"").trim().toLowerCase().replace(/\s+/g,"-").replace(/[^\w\u0600-\u06FF\-]+/g,"").slice(0,80) || ("item-"+Date.now()); }
 
-  async function signIn(email, password) {
-    const res = await fetch(SUPABASE_URL + "/auth/v1/token?grant_type=password", {
-      method: "POST",
-      headers: headers(false),
-      body: JSON.stringify({ email: email, password: password })
+  async function api(path, opt){
+    opt = opt || {};
+    var res = await fetch(URL + path, {
+      method: opt.method || "GET",
+      headers: Object.assign(hdr(opt.auth !== false), opt.headers||{}),
+      body: opt.body ? JSON.stringify(opt.body) : undefined
     });
-    const data = await res.json().catch(function () { return {}; });
-    if (!res.ok) {
-      var msg = data.error_description || data.msg || data.error || ("خطای ورود (" + res.status + ")");
+    var text = await res.text();
+    var data = null;
+    try { data = text ? JSON.parse(text) : null; } catch(e){ data = text; }
+    if(!res.ok){
+      var msg = (data && (data.message || data.msg || data.error_description || data.error)) || ("HTTP "+res.status);
+      if(typeof msg === "object") msg = JSON.stringify(msg);
       throw new Error(msg);
     }
-    return data; // { access_token, refresh_token, user, ... }
+    return data;
   }
 
-  async function fetchAdmin(userId) {
-    const res = await fetch(
-      SUPABASE_URL + "/rest/v1/admins?user_id=eq." + encodeURIComponent(userId) + "&is_active=eq.true&select=*,roles(name,permissions)",
-      { headers: Object.assign(headers(true), { "Prefer": "return=representation" }) }
-    );
-    if (!res.ok) {
-      const t = await res.text();
-      throw new Error("خطا در بررسی نقش ادمین: " + res.status + " " + t.slice(0, 120));
-    }
-    const rows = await res.json();
-    return rows && rows[0] ? rows[0] : null;
-  }
-
-  async function countTable(table, filter) {
-    var url = SUPABASE_URL + "/rest/v1/" + table + "?select=id";
-    if (filter) {
-      Object.keys(filter).forEach(function (k) {
-        url += "&" + k + "=eq." + encodeURIComponent(filter[k]);
-      });
-    }
-    const res = await fetch(url, {
-      method: "HEAD",
-      headers: Object.assign(headers(true), { "Prefer": "count=exact" })
-    });
-    var range = res.headers.get("content-range");
-    if (range && range.indexOf("/") !== -1) {
-      var n = parseInt(range.split("/")[1], 10);
-      return isNaN(n) ? 0 : n;
-    }
+  async function count(table, filter){
+    var q = "/rest/v1/"+table+"?select=id";
+    if(filter) Object.keys(filter).forEach(function(k){ q += "&"+k+"=eq."+encodeURIComponent(filter[k]); });
+    var res = await fetch(URL+q, { method:"HEAD", headers: Object.assign(hdr(true), {"Prefer":"count=exact"}) });
+    var cr = res.headers.get("content-range");
+    if(cr && cr.indexOf("/")>=0){ var n=parseInt(cr.split("/")[1],10); return isNaN(n)?0:n; }
     return 0;
   }
 
-  async function selectTable(table, order, limit) {
-    var url = SUPABASE_URL + "/rest/v1/" + table + "?select=*";
-    if (order) url += "&order=" + order;
-    if (limit) url += "&limit=" + limit;
-    const res = await fetch(url, { headers: headers(true) });
-    if (!res.ok) throw new Error("خواندن " + table + " ناموفق: " + res.status);
-    return res.json();
-  }
-
-  function showErr(msg) {
-    var el = document.getElementById("error");
-    if (el) el.textContent = msg || "";
-  }
-
-  document.getElementById("login-form").addEventListener("submit", async function (e) {
+  /* ---- Auth ---- */
+  document.getElementById("login-form").onsubmit = async function(e){
     e.preventDefault();
-    showErr("");
-    var email = document.getElementById("email").value.trim();
-    var password = document.getElementById("password").value;
-    var btn = document.getElementById("btn");
-    btn.disabled = true;
-    btn.textContent = "در حال ورود…";
-    try {
-      session = await signIn(email, password);
-      if (!session.access_token || !session.user) {
-        throw new Error("پاسخ ورود نامعتبر بود.");
-      }
-      admin = await fetchAdmin(session.user.id);
-      if (!admin) {
-        session = null;
-        throw new Error("این حساب دسترسی مدیریت ندارد. باید در جدول admins ثبت شده باشید.");
-      }
-      document.getElementById("login-wrap").style.display = "none";
-      document.getElementById("dashboard").style.display = "block";
+    var err=document.getElementById("error"); err.textContent="";
+    var btn=document.getElementById("btn"); btn.disabled=true; btn.textContent="در حال ورود…";
+    try{
+      session = await api("/auth/v1/token?grant_type=password", {
+        method:"POST", auth:false,
+        body:{ email: document.getElementById("email").value.trim(), password: document.getElementById("password").value }
+      });
+      if(!session.access_token || !session.user) throw new Error("پاسخ ورود نامعتبر");
+      var rows = await api("/rest/v1/admins?user_id=eq."+encodeURIComponent(session.user.id)+"&is_active=eq.true&select=*,roles(name,permissions)");
+      admin = rows && rows[0];
+      if(!admin){ session=null; throw new Error("این حساب دسترسی مدیریت ندارد."); }
+      document.getElementById("login-wrap").style.display="none";
+      document.getElementById("dashboard").style.display="block";
+      document.getElementById("admin-role").textContent = (admin.display_name||"")+" · "+((admin.roles&&admin.roles.name)||"ADMIN");
+      if(admin.roles && admin.roles.name==="OWNER") document.getElementById("owner-link").style.display="block";
       loadDash();
-    } catch (err) {
-      console.error(err);
-      var msg = err.message || "خطا در ورود";
-      if (/invalid.*(login|credentials)|Invalid login/i.test(msg)) {
-        msg = "ایمیل یا رمز عبور اشتباه است.";
-      }
-      if (/Failed to fetch|NetworkError|Load failed/i.test(msg)) {
-        msg = "خطای شبکه: دسترسی به سرور Supabase ممکن نیست (فیلتر شکن/اینترنت).";
-      }
-      showErr(msg);
-    } finally {
-      btn.disabled = false;
-      btn.textContent = "ورود به پنل";
-    }
-  });
+    }catch(ex){
+      var m=ex.message||"خطا";
+      if(/invalid.*(login|credentials)/i.test(m)) m="ایمیل یا رمز عبور اشتباه است.";
+      if(/Failed to fetch|NetworkError/i.test(m)) m="خطای شبکه / دسترسی به Supabase.";
+      err.textContent=m;
+    }finally{ btn.disabled=false; btn.textContent="ورود به پنل"; }
+  };
 
-  document.getElementById("logout").addEventListener("click", function (e) {
-    e.preventDefault();
-    session = null;
-    admin = null;
-    document.getElementById("dashboard").style.display = "none";
-    document.getElementById("login-wrap").style.display = "flex";
+  document.getElementById("logout").onclick=function(e){
+    e.preventDefault(); session=null; admin=null;
+    document.getElementById("dashboard").style.display="none";
+    document.getElementById("login-wrap").style.display="flex";
     document.getElementById("login-form").reset();
-    showErr("");
-  });
+  };
 
-  document.querySelectorAll("#nav a[data-p]").forEach(function (a) {
-    a.addEventListener("click", function (e) {
+  /* ---- Nav ---- */
+  document.querySelectorAll("#nav a[data-p]").forEach(function(a){
+    a.onclick=function(e){
       e.preventDefault();
-      document.querySelectorAll("#nav a").forEach(function (x) { x.classList.remove("active"); });
+      document.querySelectorAll("#nav a").forEach(function(x){x.classList.remove("active");});
       a.classList.add("active");
-      var p = a.getAttribute("data-p");
-      document.querySelectorAll(".panel").forEach(function (x) { x.classList.remove("active"); });
-      var panel = document.getElementById("p-" + p);
-      if (panel) panel.classList.add("active");
-      var titles = { dash: "داشبورد", tickets: "تیکت‌ها", memberships: "عضویت", projects: "پروژه‌ها" };
-      document.getElementById("title").textContent = titles[p] || p;
-      if (p === "dash") loadDash();
-      if (p === "tickets") loadTickets();
-      if (p === "memberships") loadMemberships();
-      if (p === "projects") loadProjects();
-    });
+      var p=a.getAttribute("data-p");
+      document.querySelectorAll(".panel").forEach(function(x){x.classList.remove("active");});
+      document.getElementById("p-"+p).classList.add("active");
+      var titles={dash:"داشبورد",news:"اخبار",products:"فروشگاه / محصولات",categories:"دسته‌بندی‌ها",projects:"پروژه‌ها",team:"اعضای تیم",tickets:"تیکت‌ها",memberships:"درخواست عضویت",orders:"سفارش‌ها",links:"لینک‌های رسمی",settings:"تنظیمات سایت"};
+      document.getElementById("title").textContent=titles[p]||p;
+      if(p==="dash") loadDash();
+      if(p==="news") loadNews();
+      if(p==="products") loadProducts();
+      if(p==="categories") loadCategories();
+      if(p==="projects") loadProjects();
+      if(p==="team") loadTeam();
+      if(p==="tickets") loadTickets();
+      if(p==="memberships") loadMemberships();
+      if(p==="orders") loadOrders();
+      if(p==="links") loadLinks();
+      if(p==="settings") loadSettings();
+    };
   });
 
-  async function loadDash() {
-    var el = document.getElementById("p-dash");
-    el.innerHTML = "<p style='color:#6a6a7a'>در حال بارگذاری…</p>";
-    try {
-      var c = await Promise.all([
-        countTable("projects").catch(function () { return 0; }),
-        countTable("tickets", { status: "OPEN" }).catch(function () { return 0; }),
-        countTable("team_applications", { status: "PENDING" }).catch(function () { return 0; }),
-        countTable("news", { status: "PUBLISHED" }).catch(function () { return 0; })
+  /* ---- Dashboard ---- */
+  async function loadDash(){
+    var el=document.getElementById("p-dash");
+    el.innerHTML="<p class='muted'>بارگذاری…</p>";
+    try{
+      var c=await Promise.all([
+        count("projects").catch(function(){return 0;}),
+        count("news").catch(function(){return 0;}),
+        count("tickets",{status:"OPEN"}).catch(function(){return 0;}),
+        count("team_applications",{status:"PENDING"}).catch(function(){return 0;}),
+        count("products").catch(function(){return 0;}),
+        count("team_members").catch(function(){return 0;})
       ]);
-      var labels = ["پروژه‌ها", "تیکت باز", "عضویت جدید", "اخبار"];
-      el.innerHTML = '<div class="stats">' + c.map(function (n, i) {
-        return '<div class="stat"><b>' + Number(n).toLocaleString("fa-IR") + "</b><span>" + labels[i] + "</span></div>";
-      }).join("") + "</div>";
-    } catch (e) {
-      el.innerHTML = "<p class='error'>" + (e.message || "خطا") + "</p>";
-    }
+      var L=["پروژه‌ها","اخبار","تیکت باز","عضویت جدید","محصولات","اعضای تیم"];
+      el.innerHTML='<div class="stats">'+c.map(function(n,i){return '<div class="stat"><b>'+Number(n).toLocaleString("fa-IR")+'</b><span>'+L[i]+'</span></div>';}).join("")+"</div>";
+    }catch(e){ el.innerHTML="<p class='error'>"+esc(e.message)+"</p>"; }
   }
 
-  async function loadTickets() {
-    var el = document.getElementById("p-tickets");
-    el.innerHTML = "…";
-    try {
-      var data = await selectTable("tickets", "created_at.desc", 40);
-      if (!data.length) { el.innerHTML = "<p style='color:#6a6a7a'>تیکتی نیست</p>"; return; }
-      el.innerHTML = "<table><thead><tr><th>موضوع</th><th>نام</th><th>وضعیت</th></tr></thead><tbody>" +
-        data.map(function (t) {
-          return "<tr><td>" + esc(t.subject) + "</td><td>" + esc(t.creator_name) + "</td><td>" + esc(t.status) + "</td></tr>";
-        }).join("") + "</tbody></table>";
-    } catch (e) {
-      el.innerHTML = "<p class='error'>" + esc(e.message) + "</p>";
-    }
+  /* ---- NEWS CRUD ---- */
+  async function loadNews(){
+    var el=document.getElementById("p-news");
+    el.innerHTML='<div class="form-box"><h3>افزودن / ویرایش خبر</h3>'+
+      '<input type="hidden" id="n-id">'+
+      '<label>عنوان *</label><input id="n-title">'+
+      '<label>محتوا</label><textarea id="n-content"></textarea>'+
+      '<div class="row2"><div><label>وضعیت</label><select id="n-status"><option value="DRAFT">پیش‌نویس</option><option value="PUBLISHED">منتشر</option><option value="ARCHIVED">آرشیو</option></select></div>'+
+      '<div><label>تصویر (URL)</label><input id="n-img" dir="ltr"></div></div>'+
+      '<button class="btn btn-primary" id="n-save">ذخیره خبر</button> <button class="btn btn-ghost" id="n-reset">پاک کردن فرم</button></div>'+
+      '<div id="n-list"><p class="muted">بارگذاری لیست…</p></div>';
+
+    document.getElementById("n-reset").onclick=function(){ document.getElementById("n-id").value=""; document.getElementById("n-title").value=""; document.getElementById("n-content").value=""; document.getElementById("n-img").value=""; document.getElementById("n-status").value="DRAFT"; };
+    document.getElementById("n-save").onclick=async function(){
+      var title=document.getElementById("n-title").value.trim();
+      if(!title){ toast("عنوان لازم است",true); return; }
+      var id=document.getElementById("n-id").value;
+      var body={ title:title, content:document.getElementById("n-content").value, status:document.getElementById("n-status").value, cover_url:document.getElementById("n-img").value.trim()||null };
+      if(body.status==="PUBLISHED") body.published_at=new Date().toISOString();
+      try{
+        if(id) await api("/rest/v1/news?id=eq."+id,{method:"PATCH",body:body});
+        else await api("/rest/v1/news",{method:"POST",body:body});
+        toast("خبر ذخیره شد"); document.getElementById("n-reset").click(); loadNews();
+      }catch(e){ toast(e.message,true); }
+    };
+    try{
+      var data=await api("/rest/v1/news?select=*&order=created_at.desc&limit=50");
+      if(!data.length){ document.getElementById("n-list").innerHTML="<p class='muted'>خبری نیست</p>"; return; }
+      document.getElementById("n-list").innerHTML="<table><thead><tr><th>عنوان</th><th>وضعیت</th><th></th></tr></thead><tbody>"+
+        data.map(function(n){ return "<tr><td>"+esc(n.title)+"</td><td><span class='badge'>"+esc(n.status)+"</span></td><td>"+
+          "<button class='btn btn-ghost btn-sm' data-edit='"+n.id+"'>ویرایش</button> "+
+          "<button class='btn btn-danger btn-sm' data-del='"+n.id+"'>حذف</button></td></tr>"; }).join("")+"</tbody></table>";
+      document.querySelectorAll("[data-edit]").forEach(function(b){
+        b.onclick=function(){
+          var n=data.find(function(x){return x.id===b.getAttribute("data-edit");});
+          if(!n) return;
+          document.getElementById("n-id").value=n.id;
+          document.getElementById("n-title").value=n.title||"";
+          document.getElementById("n-content").value=n.content||"";
+          document.getElementById("n-status").value=n.status||"DRAFT";
+          document.getElementById("n-img").value=n.cover_url||n.image_url||"";
+          window.scrollTo({top:0,behavior:"smooth"});
+        };
+      });
+      document.querySelectorAll("[data-del]").forEach(function(b){
+        b.onclick=async function(){
+          if(!confirm("حذف این خبر؟")) return;
+          try{ await api("/rest/v1/news?id=eq."+b.getAttribute("data-del"),{method:"DELETE"}); toast("حذف شد"); loadNews(); }catch(e){ toast(e.message,true); }
+        };
+      });
+    }catch(e){ document.getElementById("n-list").innerHTML="<p class='error'>"+esc(e.message)+"</p>"; }
   }
 
-  async function loadMemberships() {
-    var el = document.getElementById("p-memberships");
-    el.innerHTML = "…";
-    try {
-      var data = await selectTable("team_applications", "created_at.desc", 40);
-      if (!data.length) { el.innerHTML = "<p style='color:#6a6a7a'>درخواستی نیست</p>"; return; }
-      el.innerHTML = "<table><thead><tr><th>نام</th><th>تماس</th><th>وضعیت</th></tr></thead><tbody>" +
-        data.map(function (m) {
-          return "<tr><td>" + esc(m.name) + "</td><td dir='ltr'>" + esc(m.mobile || m.contact || "—") + "</td><td>" + esc(m.status) + "</td></tr>";
-        }).join("") + "</tbody></table>";
-    } catch (e) {
-      el.innerHTML = "<p class='error'>" + esc(e.message) + "</p>";
-    }
+  /* ---- PRODUCTS CRUD ---- */
+  async function loadProducts(){
+    var el=document.getElementById("p-products");
+    el.innerHTML='<div class="form-box"><h3>افزودن / ویرایش محصول</h3>'+
+      '<input type="hidden" id="pr-id">'+
+      '<label>نام محصول *</label><input id="pr-name">'+
+      '<label>اسلاگ (انگلیسی، یکتا)</label><input id="pr-slug" dir="ltr" placeholder="auto-from-name">'+
+      '<label>توضیح کوتاه</label><input id="pr-short">'+
+      '<label>توضیحات کامل</label><textarea id="pr-desc"></textarea>'+
+      '<div class="row2"><div><label>قیمت (تومان)</label><input id="pr-price" type="number" min="0" value="0"></div>'+
+      '<div><label>قیمت تخفیف</label><input id="pr-sale" type="number" min="0" placeholder="خالی = بدون تخفیف"></div></div>'+
+      '<div class="row2"><div><label>نسخه</label><input id="pr-ver" value="1.0.0"></div>'+
+      '<div><label>تصویر کاور (URL)</label><input id="pr-cover" dir="ltr"></div></div>'+
+      '<div class="row2"><div><label>دسته‌بندی</label><select id="pr-cat"><option value="">—</option></select></div>'+
+      '<div><label>منتشر شود؟</label><select id="pr-pub"><option value="false">خیر</option><option value="true">بله</option></select></div></div>'+
+      '<button class="btn btn-primary" id="pr-save">ذخیره محصول</button> <button class="btn btn-ghost" id="pr-reset">پاک کردن فرم</button></div>'+
+      '<div id="pr-list"><p class="muted">بارگذاری…</p></div>';
+
+    try{
+      var cats=await api("/rest/v1/product_categories?select=id,name&order=display_order");
+      var sel=document.getElementById("pr-cat");
+      cats.forEach(function(c){ var o=document.createElement("option"); o.value=c.id; o.textContent=c.name; sel.appendChild(o); });
+    }catch(e){ /* categories table may not exist yet */ }
+
+    document.getElementById("pr-reset").onclick=function(){
+      ["pr-id","pr-name","pr-slug","pr-short","pr-desc","pr-sale","pr-cover"].forEach(function(id){ document.getElementById(id).value=""; });
+      document.getElementById("pr-price").value="0"; document.getElementById("pr-ver").value="1.0.0";
+      document.getElementById("pr-pub").value="false"; document.getElementById("pr-cat").value="";
+    };
+    document.getElementById("pr-save").onclick=async function(){
+      var name=document.getElementById("pr-name").value.trim();
+      if(!name){ toast("نام لازم است",true); return; }
+      var slug=document.getElementById("pr-slug").value.trim()||slugify(name);
+      var sale=document.getElementById("pr-sale").value;
+      var body={
+        name:name, slug:slug,
+        short_description:document.getElementById("pr-short").value.trim()||null,
+        description:document.getElementById("pr-desc").value||null,
+        price:Number(document.getElementById("pr-price").value)||0,
+        sale_price: sale===""?null:Number(sale),
+        version:document.getElementById("pr-ver").value||"1.0.0",
+        cover_url:document.getElementById("pr-cover").value.trim()||null,
+        category_id:document.getElementById("pr-cat").value||null,
+        is_published: document.getElementById("pr-pub").value==="true"
+      };
+      if(body.is_published) body.published_at=new Date().toISOString();
+      var id=document.getElementById("pr-id").value;
+      try{
+        if(id) await api("/rest/v1/products?id=eq."+id,{method:"PATCH",body:body});
+        else await api("/rest/v1/products",{method:"POST",body:body});
+        toast("محصول ذخیره شد"); document.getElementById("pr-reset").click(); loadProducts();
+      }catch(e){ toast(e.message+" — اگر جدول products نیست، migration 004 را اجرا کنید",true); }
+    };
+
+    try{
+      var data=await api("/rest/v1/products?select=id,name,slug,price,sale_price,is_published,version&order=created_at.desc&limit=80");
+      if(!data.length){ document.getElementById("pr-list").innerHTML="<p class='muted'>محصولی نیست</p>"; return; }
+      document.getElementById("pr-list").innerHTML="<table><thead><tr><th>نام</th><th>قیمت</th><th>منتشر</th><th></th></tr></thead><tbody>"+
+        data.map(function(p){ return "<tr><td>"+esc(p.name)+"</td><td>"+Number(p.sale_price!=null?p.sale_price:p.price).toLocaleString("fa-IR")+"</td><td>"+(p.is_published?"بله":"خیر")+"</td><td>"+
+          "<button class='btn btn-ghost btn-sm' data-pedit='"+p.id+"'>ویرایش</button> "+
+          "<button class='btn btn-danger btn-sm' data-pdel='"+p.id+"'>حذف</button></td></tr>"; }).join("")+"</tbody></table>";
+      document.querySelectorAll("[data-pedit]").forEach(function(b){
+        b.onclick=async function(){
+          var full=await api("/rest/v1/products?id=eq."+b.getAttribute("data-pedit")+"&select=*");
+          var p=full[0]; if(!p) return;
+          document.getElementById("pr-id").value=p.id;
+          document.getElementById("pr-name").value=p.name||"";
+          document.getElementById("pr-slug").value=p.slug||"";
+          document.getElementById("pr-short").value=p.short_description||"";
+          document.getElementById("pr-desc").value=p.description||"";
+          document.getElementById("pr-price").value=p.price||0;
+          document.getElementById("pr-sale").value=p.sale_price!=null?p.sale_price:"";
+          document.getElementById("pr-ver").value=p.version||"1.0.0";
+          document.getElementById("pr-cover").value=p.cover_url||"";
+          document.getElementById("pr-cat").value=p.category_id||"";
+          document.getElementById("pr-pub").value=p.is_published?"true":"false";
+          window.scrollTo({top:0,behavior:"smooth"});
+        };
+      });
+      document.querySelectorAll("[data-pdel]").forEach(function(b){
+        b.onclick=async function(){
+          if(!confirm("حذف محصول؟")) return;
+          try{ await api("/rest/v1/products?id=eq."+b.getAttribute("data-pdel"),{method:"DELETE"}); toast("حذف شد"); loadProducts(); }catch(e){ toast(e.message,true); }
+        };
+      });
+    }catch(e){ document.getElementById("pr-list").innerHTML="<p class='error'>"+esc(e.message)+"<br><span class='muted'>جدول products نیاز به migration 004 دارد.</span></p>"; }
   }
 
-  async function loadProjects() {
-    var el = document.getElementById("p-projects");
-    el.innerHTML = "…";
-    try {
-      var data = await selectTable("projects", "display_order.asc", 40);
-      if (!data.length) { el.innerHTML = "<p style='color:#6a6a7a'>پروژه‌ای نیست</p>"; return; }
-      el.innerHTML = "<table><thead><tr><th>عنوان</th><th>وضعیت</th></tr></thead><tbody>" +
-        data.map(function (p) {
-          return "<tr><td>" + esc(p.title) + "</td><td>" + esc(p.status) + "</td></tr>";
-        }).join("") + "</tbody></table>";
-    } catch (e) {
-      el.innerHTML = "<p class='error'>" + esc(e.message) + "</p>";
-    }
+  /* ---- CATEGORIES ---- */
+  async function loadCategories(){
+    var el=document.getElementById("p-categories");
+    el.innerHTML='<div class="form-box"><h3>دسته‌بندی جدید</h3>'+
+      '<label>نام *</label><input id="c-name">'+
+      '<label>اسلاگ</label><input id="c-slug" dir="ltr">'+
+      '<label>آیکون</label><input id="c-icon" value="📦">'+
+      '<button class="btn btn-primary" id="c-save">افزودن</button></div><div id="c-list"></div>';
+    document.getElementById("c-save").onclick=async function(){
+      var name=document.getElementById("c-name").value.trim();
+      if(!name) return toast("نام لازم است",true);
+      var slug=document.getElementById("c-slug").value.trim()||slugify(name);
+      try{
+        await api("/rest/v1/product_categories",{method:"POST",body:{name:name,slug:slug,icon:document.getElementById("c-icon").value||"📦",is_active:true}});
+        toast("اضافه شد"); loadCategories();
+      }catch(e){ toast(e.message,true); }
+    };
+    try{
+      var data=await api("/rest/v1/product_categories?select=*&order=display_order");
+      document.getElementById("c-list").innerHTML=!data.length?"<p class='muted'>خالی</p>":
+        "<table><thead><tr><th>نام</th><th>اسلاگ</th><th></th></tr></thead><tbody>"+
+        data.map(function(c){ return "<tr><td>"+esc(c.icon)+" "+esc(c.name)+"</td><td dir='ltr'>"+esc(c.slug)+"</td><td>"+
+          "<button class='btn btn-danger btn-sm' data-cdel='"+c.id+"'>حذف</button></td></tr>"; }).join("")+"</tbody></table>";
+      document.querySelectorAll("[data-cdel]").forEach(function(b){
+        b.onclick=async function(){ if(!confirm("حذف؟"))return; try{ await api("/rest/v1/product_categories?id=eq."+b.getAttribute("data-cdel"),{method:"DELETE"}); loadCategories(); }catch(e){ toast(e.message,true);} };
+      });
+    }catch(e){ document.getElementById("c-list").innerHTML="<p class='error'>"+esc(e.message)+"</p>"; }
   }
 
-  function esc(s) {
-    if (s == null) return "";
-    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  /* ---- PROJECTS CRUD ---- */
+  async function loadProjects(){
+    var el=document.getElementById("p-projects");
+    el.innerHTML='<div class="form-box"><h3>افزودن / ویرایش پروژه</h3>'+
+      '<input type="hidden" id="pj-id">'+
+      '<label>عنوان *</label><input id="pj-title">'+
+      '<label>توضیحات</label><textarea id="pj-desc"></textarea>'+
+      '<div class="row2"><div><label>وضعیت</label><select id="pj-status"><option value="IN_DEVELOPMENT">در حال توسعه</option><option value="ONLINE">آنلاین</option><option value="OFFLINE">آفلاین</option><option value="ARCHIVED">آرشیو</option></select></div>'+
+      '<div><label>نسخه</label><input id="pj-ver" value="1.0.0"></div></div>'+
+      '<div class="row2"><div><label>لوگو URL</label><input id="pj-logo" dir="ltr"></div><div><label>بنر URL</label><input id="pj-banner" dir="ltr"></div></div>'+
+      '<button class="btn btn-primary" id="pj-save">ذخیره</button> <button class="btn btn-ghost" id="pj-reset">پاک کردن</button></div><div id="pj-list"></div>';
+    document.getElementById("pj-reset").onclick=function(){ ["pj-id","pj-title","pj-desc","pj-logo","pj-banner"].forEach(function(i){document.getElementById(i).value="";}); document.getElementById("pj-ver").value="1.0.0"; document.getElementById("pj-status").value="IN_DEVELOPMENT"; };
+    document.getElementById("pj-save").onclick=async function(){
+      var title=document.getElementById("pj-title").value.trim();
+      if(!title) return toast("عنوان لازم است",true);
+      var body={title:title,description:document.getElementById("pj-desc").value,status:document.getElementById("pj-status").value,version:document.getElementById("pj-ver").value,logo_url:document.getElementById("pj-logo").value.trim()||null,banner_url:document.getElementById("pj-banner").value.trim()||null};
+      var id=document.getElementById("pj-id").value;
+      try{
+        if(id) await api("/rest/v1/projects?id=eq."+id,{method:"PATCH",body:body});
+        else await api("/rest/v1/projects",{method:"POST",body:body});
+        toast("ذخیره شد"); document.getElementById("pj-reset").click(); loadProjects();
+      }catch(e){ toast(e.message,true); }
+    };
+    try{
+      var data=await api("/rest/v1/projects?select=*&order=display_order");
+      document.getElementById("pj-list").innerHTML=!data.length?"<p class='muted'>خالی</p>":
+        "<table><thead><tr><th>عنوان</th><th>وضعیت</th><th></th></tr></thead><tbody>"+
+        data.map(function(p){ return "<tr><td>"+esc(p.title)+"</td><td>"+esc(p.status)+"</td><td>"+
+          "<button class='btn btn-ghost btn-sm' data-e='"+p.id+"'>ویرایش</button> "+
+          "<button class='btn btn-danger btn-sm' data-d='"+p.id+"'>حذف</button></td></tr>"; }).join("")+"</tbody></table>";
+      document.querySelectorAll("#pj-list [data-e]").forEach(function(b){
+        b.onclick=function(){
+          var p=data.find(function(x){return x.id===b.getAttribute("data-e");});
+          if(!p)return;
+          document.getElementById("pj-id").value=p.id; document.getElementById("pj-title").value=p.title||"";
+          document.getElementById("pj-desc").value=p.description||""; document.getElementById("pj-status").value=p.status||"IN_DEVELOPMENT";
+          document.getElementById("pj-ver").value=p.version||""; document.getElementById("pj-logo").value=p.logo_url||""; document.getElementById("pj-banner").value=p.banner_url||"";
+        };
+      });
+      document.querySelectorAll("#pj-list [data-d]").forEach(function(b){
+        b.onclick=async function(){ if(!confirm("حذف؟"))return; try{ await api("/rest/v1/projects?id=eq."+b.getAttribute("data-d"),{method:"DELETE"}); loadProjects(); }catch(e){ toast(e.message,true);} };
+      });
+    }catch(e){ document.getElementById("pj-list").innerHTML="<p class='error'>"+esc(e.message)+"</p>"; }
+  }
+
+  /* ---- TEAM ---- */
+  async function loadTeam(){
+    var el=document.getElementById("p-team");
+    el.innerHTML='<div class="form-box"><h3>عضو جدید</h3>'+
+      '<label>نام *</label><input id="tm-name"><label>نقش</label><input id="tm-role"><label>بیو</label><textarea id="tm-bio"></textarea>'+
+      '<label>آواتار URL</label><input id="tm-avatar" dir="ltr">'+
+      '<button class="btn btn-primary" id="tm-save">افزودن</button></div><div id="tm-list"></div>';
+    document.getElementById("tm-save").onclick=async function(){
+      var name=document.getElementById("tm-name").value.trim();
+      if(!name) return toast("نام لازم است",true);
+      try{
+        await api("/rest/v1/team_members",{method:"POST",body:{name:name,role:document.getElementById("tm-role").value,bio:document.getElementById("tm-bio").value,avatar_url:document.getElementById("tm-avatar").value.trim()||null,is_visible:true}});
+        toast("اضافه شد"); loadTeam();
+      }catch(e){ toast(e.message,true); }
+    };
+    try{
+      var data=await api("/rest/v1/team_members?select=*&order=display_order");
+      document.getElementById("tm-list").innerHTML=!data.length?"<p class='muted'>خالی</p>":
+        "<table><thead><tr><th>نام</th><th>نقش</th><th></th></tr></thead><tbody>"+
+        data.map(function(m){ return "<tr><td>"+esc(m.name)+"</td><td>"+esc(m.role)+"</td><td><button class='btn btn-danger btn-sm' data-d='"+m.id+"'>حذف</button></td></tr>"; }).join("")+"</tbody></table>";
+      document.querySelectorAll("#tm-list [data-d]").forEach(function(b){
+        b.onclick=async function(){ if(!confirm("حذف؟"))return; await api("/rest/v1/team_members?id=eq."+b.getAttribute("data-d"),{method:"DELETE"}); loadTeam(); };
+      });
+    }catch(e){ document.getElementById("tm-list").innerHTML="<p class='error'>"+esc(e.message)+"</p>"; }
+  }
+
+  /* ---- TICKETS ---- */
+  async function loadTickets(){
+    var el=document.getElementById("p-tickets");
+    el.innerHTML="<p class='muted'>بارگذاری…</p>";
+    try{
+      var data=await api("/rest/v1/tickets?select=*&order=created_at.desc&limit=60");
+      if(!data.length){ el.innerHTML="<p class='muted'>تیکتی نیست</p>"; return; }
+      el.innerHTML="<table><thead><tr><th>موضوع</th><th>نام</th><th>وضعیت</th><th></th></tr></thead><tbody>"+
+        data.map(function(t){ return "<tr><td>"+esc(t.subject)+"</td><td>"+esc(t.creator_name)+"</td><td><select data-st='"+t.id+"'><option value='OPEN'"+(t.status==="OPEN"?" selected":"")+">باز</option><option value='IN_PROGRESS'"+(t.status==="IN_PROGRESS"?" selected":"")+">بررسی</option><option value='WAITING'"+(t.status==="WAITING"?" selected":"")+">منتظر</option><option value='CLOSED'"+(t.status==="CLOSED"?" selected":"")+">بسته</option></select></td><td><a class='btn btn-ghost btn-sm' href='support.html?token="+encodeURIComponent(t.access_token)+"' target='_blank'>چت</a></td></tr>"; }).join("")+"</tbody></table>";
+      document.querySelectorAll("[data-st]").forEach(function(s){
+        s.onchange=async function(){ try{ await api("/rest/v1/tickets?id=eq."+s.getAttribute("data-st"),{method:"PATCH",body:{status:s.value}}); toast("وضعیت عوض شد"); }catch(e){ toast(e.message,true);} };
+      });
+    }catch(e){ el.innerHTML="<p class='error'>"+esc(e.message)+"</p>"; }
+  }
+
+  /* ---- MEMBERSHIPS ---- */
+  async function loadMemberships(){
+    var el=document.getElementById("p-memberships");
+    el.innerHTML="<p class='muted'>بارگذاری…</p>";
+    try{
+      var data=await api("/rest/v1/team_applications?select=*&order=created_at.desc&limit=60");
+      if(!data.length){ el.innerHTML="<p class='muted'>درخواستی نیست</p>"; return; }
+      el.innerHTML="<table><thead><tr><th>نام</th><th>موبایل</th><th>مهارت</th><th>وضعیت</th><th></th></tr></thead><tbody>"+
+        data.map(function(m){ return "<tr><td>"+esc(m.name)+"</td><td dir='ltr'>"+esc(m.mobile||m.contact||"—")+"</td><td>"+esc((m.skills||"").slice(0,40))+"</td><td>"+esc(m.status)+"</td><td>"+
+          "<button class='btn btn-primary btn-sm' data-a='"+m.id+"'>پذیرش</button> <button class='btn btn-danger btn-sm' data-r='"+m.id+"'>رد</button></td></tr>"; }).join("")+"</tbody></table>";
+      document.querySelectorAll("[data-a]").forEach(function(b){ b.onclick=async function(){ await api("/rest/v1/team_applications?id=eq."+b.getAttribute("data-a"),{method:"PATCH",body:{status:"ACCEPTED"}}); loadMemberships(); }; });
+      document.querySelectorAll("[data-r]").forEach(function(b){ b.onclick=async function(){ await api("/rest/v1/team_applications?id=eq."+b.getAttribute("data-r"),{method:"PATCH",body:{status:"REJECTED"}}); loadMemberships(); }; });
+    }catch(e){ el.innerHTML="<p class='error'>"+esc(e.message)+"</p>"; }
+  }
+
+  /* ---- ORDERS ---- */
+  async function loadOrders(){
+    var el=document.getElementById("p-orders");
+    el.innerHTML="<p class='muted'>بارگذاری…</p>";
+    try{
+      var data=await api("/rest/v1/orders?select=*&order=created_at.desc&limit=50");
+      if(!data.length){ el.innerHTML="<p class='muted'>سفارشی نیست (بعد از migration 004 و خرید کاربران)</p>"; return; }
+      el.innerHTML="<table><thead><tr><th>شماره</th><th>وضعیت</th><th>پرداخت</th><th>مبلغ</th><th></th></tr></thead><tbody>"+
+        data.map(function(o){ return "<tr><td>"+esc(o.order_number)+"</td><td>"+esc(o.status)+"</td><td>"+esc(o.payment_status)+"</td><td>"+Number(o.total).toLocaleString("fa-IR")+"</td><td>"+
+          "<select data-os='"+o.id+"'><option value='pending_payment'>در انتظار</option><option value='paid'>پرداخت‌شده</option><option value='processing'>پردازش</option><option value='delivered'>تحویل</option><option value='cancelled'>لغو</option></select></td></tr>"; }).join("")+"</tbody></table>";
+      document.querySelectorAll("[data-os]").forEach(function(s){
+        s.value = (data.find(function(x){return x.id===s.getAttribute("data-os");})||{}).status || "pending_payment";
+        s.onchange=async function(){ try{ await api("/rest/v1/orders?id=eq."+s.getAttribute("data-os"),{method:"PATCH",body:{status:s.value,payment_status:s.value==="paid"||s.value==="delivered"?"paid":undefined}}); toast("به‌روز شد"); }catch(e){ toast(e.message,true);} };
+      });
+    }catch(e){ el.innerHTML="<p class='error'>"+esc(e.message)+"<br><span class='muted'>نیاز به migration 004</span></p>"; }
+  }
+
+  /* ---- LINKS ---- */
+  async function loadLinks(){
+    var el=document.getElementById("p-links");
+    el.innerHTML='<div class="form-box"><h3>لینک جدید</h3><label>عنوان</label><input id="l-title"><label>آدرس</label><input id="l-url" dir="ltr"><label>آیکون</label><input id="l-icon" value="🔗">'+
+      '<button class="btn btn-primary" id="l-save">افزودن</button></div><div id="l-list"></div>';
+    document.getElementById("l-save").onclick=async function(){
+      try{ await api("/rest/v1/official_links",{method:"POST",body:{title:document.getElementById("l-title").value,url:document.getElementById("l-url").value,icon:document.getElementById("l-icon").value,is_visible:true}}); toast("اضافه شد"); loadLinks(); }catch(e){ toast(e.message,true); }
+    };
+    try{
+      var data=await api("/rest/v1/official_links?select=*&order=display_order");
+      document.getElementById("l-list").innerHTML=!data.length?"<p class='muted'>خالی</p>":
+        "<table><thead><tr><th>عنوان</th><th>لینک</th><th></th></tr></thead><tbody>"+
+        data.map(function(l){ return "<tr><td>"+esc(l.icon)+" "+esc(l.title)+"</td><td dir='ltr'>"+esc(l.url)+"</td><td><button class='btn btn-danger btn-sm' data-d='"+l.id+"'>حذف</button></td></tr>"; }).join("")+"</tbody></table>";
+      document.querySelectorAll("#l-list [data-d]").forEach(function(b){ b.onclick=async function(){ await api("/rest/v1/official_links?id=eq."+b.getAttribute("data-d"),{method:"DELETE"}); loadLinks(); }; });
+    }catch(e){ document.getElementById("l-list").innerHTML="<p class='error'>"+esc(e.message)+"</p>"; }
+  }
+
+  /* ---- SETTINGS ---- */
+  async function loadSettings(){
+    var el=document.getElementById("p-settings");
+    el.innerHTML="<p class='muted'>بارگذاری…</p>";
+    try{
+      var data=await api("/rest/v1/site_settings?select=*");
+      var map={}; (data||[]).forEach(function(s){ map[s.key]=s.value; });
+      var maint = map.maintenance_mode===true || map.maintenance_mode==="true";
+      var title = typeof map.site_title==="string" ? map.site_title.replace(/^"|"$/g,"") : (map.site_title||"DARKKNIGHT STUDIO");
+      el.innerHTML='<div class="form-box"><h3>تنظیمات عمومی</h3>'+
+        '<label><input type="checkbox" id="s-maint"'+(maint?" checked":"")+"> حالت تعمیرات</label><br><br>"+
+        '<label>عنوان سایت</label><input id="s-title" value="'+esc(title)+'">'+
+        '<button class="btn btn-primary" id="s-save">ذخیره</button></div>'+
+        '<p class="muted">تنظیمات حساس‌تر (ادمین‌ها، نقش‌ها) در <a href="owner.html" style="color:#c8c8d8">پنل مالک</a> است.</p>';
+      document.getElementById("s-save").onclick=async function(){
+        try{
+          await api("/rest/v1/site_settings?key=eq.maintenance_mode",{method:"PATCH",body:{value:document.getElementById("s-maint").checked}});
+          await api("/rest/v1/site_settings?key=eq.site_title",{method:"PATCH",body:{value:JSON.stringify(document.getElementById("s-title").value.trim())}});
+          toast("ذخیره شد");
+        }catch(e){ toast(e.message,true); }
+      };
+    }catch(e){ el.innerHTML="<p class='error'>"+esc(e.message)+"</p>"; }
   }
 })();
-  </script>
+</script>
 </body>
 </html>
