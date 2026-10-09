@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>پروژه‌ها | Darkknight Studio دارک‌نایت استودیو</title>
+  <meta name="description" content="پروژه‌های Darkknight Studio — بازی، ربات و نرم‌افزار. دارک‌نایت استودیو.">
+  <meta name="keywords" content="پروژه‌های Darkknight, پروژه‌های دارک‌نایت, Darkknight projects">
+  <meta name="theme-color" content="#050508">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <header class="header" id="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo"><span class="logo-icon">⚔</span><span class="logo-text">DARKKNIGHT</span></a>
+      <nav class="nav" id="nav">
+        <a href="index.html" class="nav-link">خانه</a>
+        <a href="shop.html" class="nav-link">فروشگاه</a>
+        <a href="projects.html" class="nav-link active">پروژه‌ها</a>
+        <a href="membership.html" class="nav-link">عضویت</a>
+        <a href="support.html" class="nav-link">پشتیبانی</a>
+        <a href="contact.html" class="nav-link">تماس</a>
+      </nav>
+      <div class="header-actions">
+        <div class="header-auth" id="auth-slot"></div>
+        <button class="menu-toggle" id="menu-toggle" aria-label="منو"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container section">
+    <div class="section-header" style="text-align:right">
+      <h1>پروژه‌های Darkknight Studio</h1>
+      <p>پروژه‌های در حال توسعه و منتشرشده استودیو</p>
+    </div>
+    <div class="grid grid-3" id="projects-grid">
+      <div class="loading-state"><div class="spinner"></div><p>در حال بارگذاری…</p></div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-bottom">
+      <span>© <span id="year"></span> Darkknight Studio</span>
+      <a href="index.html">خانه</a>
+    </div>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    const toggle = document.getElementById('menu-toggle');
+    const nav = document.getElementById('nav');
+    if (toggle && nav) toggle.onclick = () => { nav.classList.toggle('open'); toggle.classList.toggle('open'); };
+
+    (async () => {
+      if (!DK.isConfigured) DK.initSupabase();
+      const grid = document.getElementById('projects-grid');
+      try {
+        const { data, error } = await DK.supabase
+          .from('projects')
+          .select('id,title,description,logo_url,banner_url,status,version,display_order')
+          .neq('status', 'ARCHIVED')
+          .order('display_order', { ascending: true });
+        if (error) throw error;
+        if (!data || !data.length) {
+          grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚔</div><p>پروژه‌ای ثبت نشده است</p></div>';
+          return;
+        }
+        const statusLabel = { ONLINE: 'آنلاین', OFFLINE: 'آفلاین', IN_DEVELOPMENT: 'در حال توسعه' };
+        grid.innerHTML = data.map(p => `
+          <a href="project.html?id=${p.id}" class="card project-card">
+            ${p.banner_url || p.logo_url
+              ? `<img class="project-card-img" src="${DK.escape(p.banner_url || p.logo_url)}" alt="" loading="lazy">`
+              : `<div class="project-card-img" style="display:flex;align-items:center;justify-content:center;font-size:2rem;opacity:.4">⚔</div>`}
+            <div class="project-card-body">
+              <div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center">
+                <h3 class="card-title">${DK.escape(p.title)}</h3>
+                <span class="badge">${statusLabel[p.status] || p.status}</span>
+              </div>
+              <p class="text-muted" style="font-size:.85rem">${DK.escape((p.description||'').slice(0,140))}</p>
+              ${p.version ? `<span class="card-meta">v${DK.escape(p.version)}</span>` : ''}
+            </div>
+          </a>`).join('');
+      } catch (e) {
+        grid.innerHTML = '<div class="empty-state"><p>خطا در بارگذاری پروژه‌ها</p></div>';
+        console.error(e);
+      }
+    })();
+  </script>
+</body>
+</html>
