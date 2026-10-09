@@ -8,81 +8,335 @@
   <meta name="theme-color" content="#050508">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔</text></svg>">
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/themes.css">
-  <link rel="stylesheet" href="css/main.css">
-  <link rel="stylesheet" href="css/responsive.css">
-  <link rel="stylesheet" href="css/dashboard.css">
   <style>
-    .admin-login-screen {
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Vazirmatn, system-ui, sans-serif;
+      background: #050508;
+      color: #f0f0f5;
+      min-height: 100vh;
+    }
+    .login-wrap {
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 1.5rem;
-      background: var(--bg-deep, #050508);
-      color: var(--text-primary, #f0f0f5);
-      font-family: Vazirmatn, system-ui, sans-serif;
     }
-    .admin-login-card {
+    .card {
       width: 100%;
       max-width: 400px;
-      background: var(--bg-card, rgba(26,26,36,0.9));
+      background: rgba(26,26,36,0.95);
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 16px;
-      padding: 1.5rem;
+      padding: 1.75rem;
     }
-    .admin-login-card h1 { font-size: 1.25rem; margin: 0 0 0.25rem; text-align: center; }
-    .admin-login-card .sub { text-align: center; color: #a0a0b0; font-size: 0.9rem; margin-bottom: 1.25rem; }
-    .admin-login-card label { display: block; margin-bottom: 0.35rem; font-size: 0.875rem; color: #a0a0b0; }
-    .admin-login-card input {
-      width: 100%; padding: 0.65rem 0.9rem; margin-bottom: 1rem;
-      background: #12121a; border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 10px; color: #f0f0f5; font-size: 1rem; box-sizing: border-box;
+    .icon { text-align: center; font-size: 2rem; margin-bottom: 0.5rem; }
+    h1 { text-align: center; font-size: 1.25rem; margin-bottom: 0.25rem; }
+    .sub { text-align: center; color: #a0a0b0; font-size: 0.9rem; margin-bottom: 1.25rem; }
+    label { display: block; margin-bottom: 0.35rem; font-size: 0.875rem; color: #a0a0b0; }
+    input {
+      width: 100%;
+      padding: 0.7rem 0.9rem;
+      margin-bottom: 1rem;
+      background: #12121a;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      color: #f0f0f5;
+      font-size: 1rem;
+      font-family: inherit;
     }
-    .admin-login-card input:focus { outline: none; border-color: #c8c8d8; }
-    .admin-login-card .btn-submit {
-      width: 100%; padding: 0.75rem; border: none; border-radius: 10px;
-      background: #c8c8d8; color: #0a0a0f; font-weight: 700; font-size: 0.95rem;
-      cursor: pointer; font-family: inherit;
+    input:focus { outline: none; border-color: #c8c8d8; }
+    .btn {
+      width: 100%;
+      padding: 0.8rem;
+      border: none;
+      border-radius: 10px;
+      background: #c8c8d8;
+      color: #0a0a0f;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      font-family: inherit;
     }
-    .admin-login-card .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
-    .admin-login-card .error { color: #ef4444; font-size: 0.85rem; margin: 0 0 0.75rem; min-height: 1.2em; }
-    .admin-login-card .back { text-align: center; margin-top: 1rem; }
-    .admin-login-card .back a { color: #a0a0b0; text-decoration: none; font-size: 0.85rem; }
-    #admin-dashboard { display: none; }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .error { color: #ef4444; font-size: 0.85rem; margin-bottom: 0.75rem; min-height: 1.25em; }
+    .back { text-align: center; margin-top: 1rem; }
+    .back a { color: #a0a0b0; text-decoration: none; font-size: 0.85rem; }
+    #dashboard { display: none; }
+    .dash { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+    .side { background: #0a0a0f; border-left: 1px solid rgba(255,255,255,0.08); padding: 1rem; }
+    .side a { display: block; padding: 0.55rem 0.75rem; color: #a0a0b0; text-decoration: none; border-radius: 8px; font-size: 0.875rem; margin-bottom: 0.15rem; }
+    .side a:hover, .side a.active { background: rgba(200,200,216,0.15); color: #f0f0f5; }
+    .main { padding: 1.5rem; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fill,minmax(140px,1fr)); gap: 1rem; }
+    .stat { background: rgba(26,26,36,0.9); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1rem; }
+    .stat b { font-size: 1.4rem; display: block; }
+    .stat span { font-size: 0.8rem; color: #6a6a7a; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; margin-top: 1rem; }
+    th, td { padding: 0.55rem; border-bottom: 1px solid rgba(255,255,255,0.08); text-align: right; }
+    th { color: #6a6a7a; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    @media (max-width: 768px) { .dash { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-  <div id="admin-login-screen" class="admin-login-screen">
-    <div class="admin-login-card">
-      <div style="text-align:center;font-size:2rem;margin-bottom:0.5rem">⚔</div>
+  <div id="login-wrap" class="login-wrap">
+    <div class="card">
+      <div class="icon">⚔</div>
       <h1>پنل مدیریت</h1>
       <p class="sub">Darkknight Studio — ورود با ایمیل و رمز عبور</p>
-      <form id="admin-login-form" autocomplete="on">
-        <label for="admin-email">ایمیل</label>
-        <input type="email" id="admin-email" name="email" required autocomplete="username" dir="ltr" placeholder="admin@example.com">
-        <label for="admin-password">رمز عبور</label>
-        <input type="password" id="admin-password" name="password" required autocomplete="current-password" dir="ltr" minlength="6" placeholder="••••••••">
-        <p class="error" id="admin-login-error" role="alert"></p>
-        <button type="submit" class="btn-submit" id="admin-login-btn">ورود به پنل</button>
+      <form id="login-form">
+        <label for="email">ایمیل</label>
+        <input type="email" id="email" name="email" required autocomplete="username" dir="ltr" placeholder="admin@example.com">
+        <label for="password">رمز عبور</label>
+        <input type="password" id="password" name="password" required autocomplete="current-password" dir="ltr" minlength="6">
+        <p class="error" id="error" role="alert"></p>
+        <button type="submit" class="btn" id="btn">ورود به پنل</button>
       </form>
       <p class="back"><a href="index.html">بازگشت به سایت</a></p>
     </div>
   </div>
-  <div id="admin-dashboard"></div>
+
+  <div id="dashboard">
+    <div class="dash">
+      <aside class="side">
+        <div style="font-weight:800;padding:0.5rem 0.75rem 1rem">⚔ پنل مدیریت</div>
+        <nav id="nav">
+          <a href="#" data-p="dash" class="active">داشبورد</a>
+          <a href="#" data-p="tickets">تیکت‌ها</a>
+          <a href="#" data-p="memberships">عضویت</a>
+          <a href="#" data-p="projects">پروژه‌ها</a>
+          <a href="index.html">سایت</a>
+          <a href="#" id="logout">خروج</a>
+        </nav>
+      </aside>
+      <main class="main">
+        <h2 id="title" style="margin-bottom:1rem;font-size:1.2rem">داشبورد</h2>
+        <div id="p-dash" class="panel active"></div>
+        <div id="p-tickets" class="panel"></div>
+        <div id="p-memberships" class="panel"></div>
+        <div id="p-projects" class="panel"></div>
+      </main>
+    </div>
+  </div>
 
   <script>
-    // Inline config so admin never depends on failed external config load
-    window.DK_CONFIG = {
-      SUPABASE_URL: 'https://exaryvtjayuwgyqnioem.supabase.co',
-      SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4YXJ5dnRqYXl1d2d5cW5pb2VtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1NzgxMjUsImV4cCI6MjEwNTE1NDEyNX0.qMKyG9gwUTeNbfXhzbSbTEJMEh4Dy-5M3gZ9vXpmsKs',
-      BASE_PATH: '/darkknightstudio-website/darkknight',
-      SITE_NAME: 'Darkknight Studio'
+(function () {
+  const SUPABASE_URL = "https://exaryvtjayuwgyqnioem.supabase.co";
+  const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4YXJ5dnRqYXl1d2d5cW5pb2VtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1NzgxMjUsImV4cCI6MjEwNTE1NDEyNX0.qMKyG9gwUTeNbfXhzbSbTEJMEh4Dy-5M3gZ9vXpmsKs";
+
+  let session = null;
+  let admin = null;
+
+  function headers(auth) {
+    const h = {
+      "apikey": ANON_KEY,
+      "Content-Type": "application/json"
     };
-    window.DK = window.DK || {};
+    if (auth && session && session.access_token) {
+      h["Authorization"] = "Bearer " + session.access_token;
+    } else {
+      h["Authorization"] = "Bearer " + ANON_KEY;
+    }
+    return h;
+  }
+
+  async function signIn(email, password) {
+    const res = await fetch(SUPABASE_URL + "/auth/v1/token?grant_type=password", {
+      method: "POST",
+      headers: headers(false),
+      body: JSON.stringify({ email: email, password: password })
+    });
+    const data = await res.json().catch(function () { return {}; });
+    if (!res.ok) {
+      var msg = data.error_description || data.msg || data.error || ("خطای ورود (" + res.status + ")");
+      throw new Error(msg);
+    }
+    return data; // { access_token, refresh_token, user, ... }
+  }
+
+  async function fetchAdmin(userId) {
+    const res = await fetch(
+      SUPABASE_URL + "/rest/v1/admins?user_id=eq." + encodeURIComponent(userId) + "&is_active=eq.true&select=*,roles(name,permissions)",
+      { headers: Object.assign(headers(true), { "Prefer": "return=representation" }) }
+    );
+    if (!res.ok) {
+      const t = await res.text();
+      throw new Error("خطا در بررسی نقش ادمین: " + res.status + " " + t.slice(0, 120));
+    }
+    const rows = await res.json();
+    return rows && rows[0] ? rows[0] : null;
+  }
+
+  async function countTable(table, filter) {
+    var url = SUPABASE_URL + "/rest/v1/" + table + "?select=id";
+    if (filter) {
+      Object.keys(filter).forEach(function (k) {
+        url += "&" + k + "=eq." + encodeURIComponent(filter[k]);
+      });
+    }
+    const res = await fetch(url, {
+      method: "HEAD",
+      headers: Object.assign(headers(true), { "Prefer": "count=exact" })
+    });
+    var range = res.headers.get("content-range");
+    if (range && range.indexOf("/") !== -1) {
+      var n = parseInt(range.split("/")[1], 10);
+      return isNaN(n) ? 0 : n;
+    }
+    return 0;
+  }
+
+  async function selectTable(table, order, limit) {
+    var url = SUPABASE_URL + "/rest/v1/" + table + "?select=*";
+    if (order) url += "&order=" + order;
+    if (limit) url += "&limit=" + limit;
+    const res = await fetch(url, { headers: headers(true) });
+    if (!res.ok) throw new Error("خواندن " + table + " ناموفق: " + res.status);
+    return res.json();
+  }
+
+  function showErr(msg) {
+    var el = document.getElementById("error");
+    if (el) el.textContent = msg || "";
+  }
+
+  document.getElementById("login-form").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    showErr("");
+    var email = document.getElementById("email").value.trim();
+    var password = document.getElementById("password").value;
+    var btn = document.getElementById("btn");
+    btn.disabled = true;
+    btn.textContent = "در حال ورود…";
+    try {
+      session = await signIn(email, password);
+      if (!session.access_token || !session.user) {
+        throw new Error("پاسخ ورود نامعتبر بود.");
+      }
+      admin = await fetchAdmin(session.user.id);
+      if (!admin) {
+        session = null;
+        throw new Error("این حساب دسترسی مدیریت ندارد. باید در جدول admins ثبت شده باشید.");
+      }
+      document.getElementById("login-wrap").style.display = "none";
+      document.getElementById("dashboard").style.display = "block";
+      loadDash();
+    } catch (err) {
+      console.error(err);
+      var msg = err.message || "خطا در ورود";
+      if (/invalid.*(login|credentials)|Invalid login/i.test(msg)) {
+        msg = "ایمیل یا رمز عبور اشتباه است.";
+      }
+      if (/Failed to fetch|NetworkError|Load failed/i.test(msg)) {
+        msg = "خطای شبکه: دسترسی به سرور Supabase ممکن نیست (فیلتر شکن/اینترنت).";
+      }
+      showErr(msg);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "ورود به پنل";
+    }
+  });
+
+  document.getElementById("logout").addEventListener("click", function (e) {
+    e.preventDefault();
+    session = null;
+    admin = null;
+    document.getElementById("dashboard").style.display = "none";
+    document.getElementById("login-wrap").style.display = "flex";
+    document.getElementById("login-form").reset();
+    showErr("");
+  });
+
+  document.querySelectorAll("#nav a[data-p]").forEach(function (a) {
+    a.addEventListener("click", function (e) {
+      e.preventDefault();
+      document.querySelectorAll("#nav a").forEach(function (x) { x.classList.remove("active"); });
+      a.classList.add("active");
+      var p = a.getAttribute("data-p");
+      document.querySelectorAll(".panel").forEach(function (x) { x.classList.remove("active"); });
+      var panel = document.getElementById("p-" + p);
+      if (panel) panel.classList.add("active");
+      var titles = { dash: "داشبورد", tickets: "تیکت‌ها", memberships: "عضویت", projects: "پروژه‌ها" };
+      document.getElementById("title").textContent = titles[p] || p;
+      if (p === "dash") loadDash();
+      if (p === "tickets") loadTickets();
+      if (p === "memberships") loadMemberships();
+      if (p === "projects") loadProjects();
+    });
+  });
+
+  async function loadDash() {
+    var el = document.getElementById("p-dash");
+    el.innerHTML = "<p style='color:#6a6a7a'>در حال بارگذاری…</p>";
+    try {
+      var c = await Promise.all([
+        countTable("projects").catch(function () { return 0; }),
+        countTable("tickets", { status: "OPEN" }).catch(function () { return 0; }),
+        countTable("team_applications", { status: "PENDING" }).catch(function () { return 0; }),
+        countTable("news", { status: "PUBLISHED" }).catch(function () { return 0; })
+      ]);
+      var labels = ["پروژه‌ها", "تیکت باز", "عضویت جدید", "اخبار"];
+      el.innerHTML = '<div class="stats">' + c.map(function (n, i) {
+        return '<div class="stat"><b>' + Number(n).toLocaleString("fa-IR") + "</b><span>" + labels[i] + "</span></div>";
+      }).join("") + "</div>";
+    } catch (e) {
+      el.innerHTML = "<p class='error'>" + (e.message || "خطا") + "</p>";
+    }
+  }
+
+  async function loadTickets() {
+    var el = document.getElementById("p-tickets");
+    el.innerHTML = "…";
+    try {
+      var data = await selectTable("tickets", "created_at.desc", 40);
+      if (!data.length) { el.innerHTML = "<p style='color:#6a6a7a'>تیکتی نیست</p>"; return; }
+      el.innerHTML = "<table><thead><tr><th>موضوع</th><th>نام</th><th>وضعیت</th></tr></thead><tbody>" +
+        data.map(function (t) {
+          return "<tr><td>" + esc(t.subject) + "</td><td>" + esc(t.creator_name) + "</td><td>" + esc(t.status) + "</td></tr>";
+        }).join("") + "</tbody></table>";
+    } catch (e) {
+      el.innerHTML = "<p class='error'>" + esc(e.message) + "</p>";
+    }
+  }
+
+  async function loadMemberships() {
+    var el = document.getElementById("p-memberships");
+    el.innerHTML = "…";
+    try {
+      var data = await selectTable("team_applications", "created_at.desc", 40);
+      if (!data.length) { el.innerHTML = "<p style='color:#6a6a7a'>درخواستی نیست</p>"; return; }
+      el.innerHTML = "<table><thead><tr><th>نام</th><th>تماس</th><th>وضعیت</th></tr></thead><tbody>" +
+        data.map(function (m) {
+          return "<tr><td>" + esc(m.name) + "</td><td dir='ltr'>" + esc(m.mobile || m.contact || "—") + "</td><td>" + esc(m.status) + "</td></tr>";
+        }).join("") + "</tbody></table>";
+    } catch (e) {
+      el.innerHTML = "<p class='error'>" + esc(e.message) + "</p>";
+    }
+  }
+
+  async function loadProjects() {
+    var el = document.getElementById("p-projects");
+    el.innerHTML = "…";
+    try {
+      var data = await selectTable("projects", "display_order.asc", 40);
+      if (!data.length) { el.innerHTML = "<p style='color:#6a6a7a'>پروژه‌ای نیست</p>"; return; }
+      el.innerHTML = "<table><thead><tr><th>عنوان</th><th>وضعیت</th></tr></thead><tbody>" +
+        data.map(function (p) {
+          return "<tr><td>" + esc(p.title) + "</td><td>" + esc(p.status) + "</td></tr>";
+        }).join("") + "</tbody></table>";
+    } catch (e) {
+      el.innerHTML = "<p class='error'>" + esc(e.message) + "</p>";
+    }
+  }
+
+  function esc(s) {
+    if (s == null) return "";
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+})();
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js"></script>
-  <script src="js/utils.js"></script>
-  <script src="js/admin.js"></script>
 </body>
 </html>
