@@ -1,17 +1,41 @@
-/* Darkknight Studio — Admin panel: real login form first */
+/* Darkknight Studio — Admin panel with robust Supabase init */
 const Admin = {
   admin: null,
 
   init() {
-    try {
-      if (window.DK && !DK.isConfigured && typeof DK.initSupabase === "function") {
-        DK.initSupabase();
-      }
-    } catch (e) {
-      console.warn(e);
-    }
+    this.ensureSupabase();
     const form = document.getElementById("admin-login-form");
     if (form) form.addEventListener("submit", (e) => this.handleLogin(e));
+  },
+
+  ensureSupabase() {
+    try {
+      if (typeof window.DK === "undefined") {
+        window.DK = {};
+      }
+      const cfg = window.DK_CONFIG || {};
+      if (!cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY) {
+        return { ok: false, error: "تنظیمات SUPABASE در config.js یافت نشد." };
+      }
+      if (typeof supabase === "undefined" || !supabase.createClient) {
+        return { ok: false, error: "کتابخانه Supabase از CDN لود نشد. اینترنت یا مسدودکننده تبلیغات را چک کنید." };
+      }
+      if (!DK.supabase) {
+        DK.supabase = supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true,
+            storage: window.localStorage
+          }
+        });
+        DK.isConfigured = true;
+      }
+      return { ok: true };
+    } catch (e) {
+      console.error(e);
+      return { ok: false, error: e.message || "خطا در اتصال Supabase" };
+    }
   },
 
   async handleLogin(e) {
@@ -28,23 +52,23 @@ const Admin = {
       return;
     }
 
+    const conn = this.ensureSupabase();
+    if (!conn.ok) {
+      if (errEl) errEl.textContent = conn.error;
+      return;
+    }
+
     if (btn) {
       btn.disabled = true;
       btn.textContent = "در حال ورود…";
     }
 
     try {
-      if (!window.DK || !DK.supabase) {
-        if (typeof DK !== "undefined" && DK.initSupabase) DK.initSupabase();
-      }
-      if (!DK.supabase) throw new Error("اتصال Supabase برقرار نشد. صفحه را رفرش کنید.");
-
-      const { data, error } = await DK.supabase.auth.signInWithPassword({ email, password });
+      const client = DK.supabase;
+      const { data, error } = await client.auth.signInWithPassword({ email, password });
       if (error) throw error;
 
-      if (DK._sessionCache !== undefined) DK._sessionCache = data.session;
-
-      const { data: adminRow, error: adminErr } = await DK.supabase
+      const { data: adminRow, error: adminErr } = await client
         .from("admins")
         .select("*, roles(name, permissions)")
         .eq("user_id", data.user.id)
@@ -54,8 +78,8 @@ const Admin = {
       if (adminErr) throw adminErr;
 
       if (!adminRow) {
-        await DK.supabase.auth.signOut();
-        if (errEl) errEl.textContent = "این حساب دسترسی مدیریت ندارد.";
+        await client.auth.signOut();
+        if (errEl) errEl.textContent = "این حساب دسترسی مدیریت ندارد. باید در جدول admins ثبت شده باشید.";
         return;
       }
 
@@ -66,6 +90,9 @@ const Admin = {
       let msg = err.message || "خطا در ورود";
       if (/invalid login|invalid_credentials|Invalid login/i.test(msg)) {
         msg = "ایمیل یا رمز عبور اشتباه است.";
+      }
+      if (/Failed to fetch|NetworkError|network/i.test(msg)) {
+        msg = "خطای شبکه — اتصال اینترنت یا دسترسی به Supabase را بررسی کنید.";
       }
       if (errEl) errEl.textContent = msg;
     } finally {
@@ -146,8 +173,7 @@ const Admin = {
     });
     document.getElementById("admin-logout").addEventListener("click", async (ev) => {
       ev.preventDefault();
-      try { await DK.supabase.auth.signOut(); } catch (_) {}
-      if (DK._sessionCache !== undefined) DK._sessionCache = null;
+      try { if (DK.supabase) await DK.supabase.auth.signOut(); } catch (_) {}
       this.admin = null;
       this.showLogin();
     });
@@ -173,17 +199,24 @@ const Admin = {
     if (!el) return;
     el.innerHTML = '<div class="loading-state"><div class="spinner"></div></div>';
     try {
+      const client = DK.supabase;
+      const q = async (table, filter) => {
+        let query = client.from(table).select("*", { count: "exact", head: true });
+        if (filter) Object.entries(filter).forEach(([k, v]) => { query = query.eq(k, v); });
+        const { count } = await query;
+        return count || 0;
+      };
       const counts = await Promise.all([
-        DK.db.count("projects").catch(() => ({ count: 0 })),
-        DK.db.count("tickets", { eq: { status: "OPEN" } }).catch(() => ({ count: 0 })),
-        DK.db.count("team_applications", { eq: { status: "PENDING" } }).catch(() => ({ count: 0 })),
-        DK.db.count("products", { eq: { is_published: true } }).catch(() => ({ count: 0 })),
-        DK.db.count("orders").catch(() => ({ count: 0 })),
-        DK.db.count("news", { eq: { status: "PUBLISHED" } }).catch(() => ({ count: 0 })),
+        q("projects").catch(() => 0),
+        q("tickets", { status: "OPEN" }).catch(() => 0),
+        q("team_applications", { status: "PENDING" }).catch(() => 0),
+        q("products", { is_published: true }).catch(() => 0),
+        q("orders").catch(() => 0),
+        q("news", { status: "PUBLISHED" }).catch(() => 0),
       ]);
       const labels = ["پروژه‌ها", "تیکت باز", "عضویت جدید", "محصول منتشر", "سفارش‌ها", "اخبار"];
       el.innerHTML = '<div class="dash-stats">' + counts.map((c, i) =>
-        '<div class="dash-stat"><div class="dash-stat-value">' + (c.count || 0).toLocaleString("fa-IR") +
+        '<div class="dash-stat"><div class="dash-stat-value">' + Number(c).toLocaleString("fa-IR") +
         '</div><div class="dash-stat-label">' + labels[i] + '</div></div>'
       ).join("") + '</div>';
     } catch (e) {
